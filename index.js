@@ -1,4 +1,8 @@
 const { createWorker } = require("tesseract.js");
+const fs = require('fs')
+
+
+const testFolder = './files/';
 
 const worker = createWorker({});
 const puppeteer = require("puppeteer");
@@ -17,6 +21,21 @@ const resolveCaptcha = async (url) => {
 
   return text;
 };
+
+  const getAllFilesNames = () => {
+   let files = fs.readdirSync(testFolder)
+    if( (files.length == 1) && !(files.filter(file => !(['sig','pdf'].includes(file.split('.')[1]))).length > 0)){
+      return 'sig'
+    } else if(files.length == 2 && !(files.filter(file => !(['sig','pdf'].includes(file.split('.')[1]))).length > 0)){
+      console.log('her2');
+      return 'pdfsig'
+    } else {
+      return 'tosig'
+    }
+   
+  }
+
+  console.log(getAllFilesNames());
 
 const resolved = async (id) => {
   return {
@@ -42,44 +61,53 @@ const val = async (id) => {
 };
 
 const uslugi = async () => {
-  let launchOptions = { headless: false, args: ["--start-maximized"] };
+  switch(getAllFilesNames()){
+    case 'pdfsig' : {let launchOptions = { headless: false, args: ["--start-maximized"] };
 
-  const browser = await puppeteer.launch(launchOptions);
-
-  const page = await browser.newPage();
-
-  await page.setViewport({ width: 1366, height: 768 });
-  await page.setUserAgent(
-    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36"
-  );
-
-  await page.goto("https://www.gosuslugi.ru/pgu/eds");
-  await page.evaluate(() => {
-    document.querySelector('a[name="currentAction"]').click();
-    document.querySelector('span[rel="3"]').click();
-  });
-
-  const images = await page.$$eval(".captcha-img", (anchors) =>
-    [].map.call(anchors, (img) => img.src)
-  );
-
-  const id = images[0].split("id=")[1];
-
-  val(id).then(async (resolved) => {
-    const fileInput = await page.$('input[name="docSignature"]');
-    await fileInput.uploadFile("./files/test.pdf");
-    const fileInput2 = await page.$('input[name="docDocument"]');
-    await fileInput2.uploadFile("./files/test.sig");
-    await page.type("#captchaAnswer3", resolved.captchaAnswer, {
-      delay: 100,
+    const browser = await puppeteer.launch(launchOptions);
+  
+    const page = await browser.newPage();
+  
+    await page.setViewport({ width: 1366, height: 768 });
+    await page.setUserAgent(
+      "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36"
+    );
+  
+    await page.goto("https://www.gosuslugi.ru/pgu/eds");
+    await page.evaluate(() => {
+      document.querySelector('a[name="currentAction"]').click();
+      document.querySelector('span[rel="3"]').click();
     });
-    page.waitForSelector("#elsign-result").then(async () => {
-      let element = await page.$("#elsign-result");
-      let value = await page.evaluate((el) => el.textContent, element);
-      console.log(value);
-      return value;
-    });
-  });
+  
+    const images = await page.$$eval(".captcha-img", (anchors) =>
+      [].map.call(anchors, (img) => img.src)
+    );
+  
+    const id = images[0].split("id=")[1];
+  
+    val(id).then(async (resolved) => {
+      const fileInput = await page.$('input[name="docSignature"]');
+      await fileInput.uploadFile("./files/test.pdf");
+      const fileInput2 = await page.$('input[name="docDocument"]');
+      await fileInput2.uploadFile("./files/test.sig");
+      await page.type("#captchaAnswer3", resolved.captchaAnswer, {
+        delay: 100,
+      });
+      
+        page.waitForSelector("#elsign-result", {timeout: 5000}).then(async () => {
+          console.log('HUUUUUUUUUUUUUUUUUUUUUUUY');
+          let element = await page.$("#elsign-result");
+          let value = await page.evaluate((el) => el.textContent, element);
+          console.log(value);
+          return value;
+        }).catch(e => { console.log('ОШИИИБКА');
+        uslugi()})
+
+  
+      
+    });  }
+  }
+  
 };
 
 const cryptoPro = async () => {
