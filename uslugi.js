@@ -3,7 +3,7 @@ const fs = require('fs');
 
 const resolveCaptcha = require('./utils/resolveCaptcha.js');
 
-const { testFolder } = require('./constants.js');
+const { testFolder, maximumPing } = require('./constants.js');
 
 const getAllFilesNames = () => {
   let files = fs.readdirSync(testFolder);
@@ -93,7 +93,7 @@ const uslugi = async (count = 1) => {
 
     try {
       await page.waitForSelector('#elsign-result', {
-        timeout: 1000,
+        timeout: maximumPing,
       });
     } catch (err) {
       throw 'Капча провалена';

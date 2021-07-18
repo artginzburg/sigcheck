@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer');
-const { testFolder } = require('./constants.js');
+const { testFolder, maximumPing } = require('./constants.js');
 
 const resultSelector = '#server-errors';
 const errorText = 'Произошла ошибка при проверке документа';
@@ -17,7 +17,7 @@ module.exports = async function cryptoPro() {
   submitButton.click();
 
   await page.waitForSelector(resultSelector, {
-    timeout: 5000,
+    timeout: maximumPing,
   });
   const resultElement = await page.$(resultSelector);
   const resultValue = await page.evaluate((el) => el.textContent, resultElement);
