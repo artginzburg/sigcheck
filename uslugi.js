@@ -49,124 +49,95 @@ const puppeteerLaunchOptions = {
 };
 
 const uslugi = async (count = 1) => {
-  if (getAllFilesNames() == 'pdfsig') {
-    const browser = await puppeteer.launch(puppeteerLaunchOptions);
-    const page = await browser.newPage();
+  const namesArePdfSig = getAllFilesNames() === 'pdfsig';
+  const captchaNumber = namesArePdfSig ? 3 : 2;
 
-    await page.setViewport({
-      width: 1366,
-      height: 768,
+  const browser = await puppeteer.launch(puppeteerLaunchOptions);
+  const page = await browser.newPage();
+
+  await page.setViewport({
+    width: 1366,
+    height: 768,
+  });
+  await page.setUserAgent(
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36'
+  );
+
+  await page.goto('https://www.gosuslugi.ru/pgu/eds');
+  await page.click('a[name="currentAction"]');
+  await page.click(`span[rel="${captchaNumber}"]`);
+
+  const images = await page.$$eval('.captcha-img', (anchors) =>
+    [].map.call(anchors, (img) => img.src)
+  );
+
+  const id = images[0].split('id=')[1];
+
+  const resolved = await val(id);
+
+  if (namesArePdfSig) {
+    const fileInput = await page.$('input[name="docSignature"]');
+    await fileInput.uploadFile(`${testFolder}test.pdf`);
+
+    const fileInput2 = await page.$('input[name="docDocument"]');
+    await fileInput2.uploadFile(`${testFolder}test.sig`);
+
+    await page.type(`#captchaAnswer${captchaNumber}`, resolved.captchaAnswer, {
+      delay: 100,
     });
-    await page.setUserAgent(
-      'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36'
-    );
 
-    await page.goto('https://www.gosuslugi.ru/pgu/eds');
-    await page.evaluate(() => {
-      document.querySelector('a[name="currentAction"]').click();
-      document.querySelector('span[rel="3"]').click();
+    await page.waitForSelector('#elsign-result', {
+      timeout: 5000,
     });
 
-    const images = await page.$$eval('.captcha-img', (anchors) =>
-      [].map.call(anchors, (img) => img.src)
-    );
-
-    const id = images[0].split('id=')[1];
-
-    val(id).then(async (resolved) => {
-      const fileInput = await page.$('input[name="docSignature"]');
-      await fileInput.uploadFile(`${testFolder}test.pdf`);
-      const fileInput2 = await page.$('input[name="docDocument"]');
-      await fileInput2.uploadFile(`${testFolder}test.sig`);
-      await page.type('#captchaAnswer3', resolved.captchaAnswer, {
-        delay: 100,
-      });
-
-      page
-        .waitForSelector('#elsign-result', {
-          timeout: 5000,
-        })
-        .then(async () => {
-          let element = await page.$('#elsign-result');
-          let value = await page.evaluate((el) => el.textContent, element);
-          return value;
-        })
-        .catch((e) => {
-          console.log('ОШИИИБКА');
-          uslugi();
-        });
-    });
+    try {
+      let element = await page.$('#elsign-result');
+      let value = await page.evaluate((el) => el.textContent, element);
+      return value;
+    } catch (error) {
+      console.log('Ошибка при получении текстового контекта результата');
+      throw error;
+    }
   } else {
-    let launchOptions = {
-      headless: false,
-      args: ['--start-maximized'],
-    };
+    const fileInput = await page.$('input[name="document"]');
+    await fileInput.uploadFile(`${testFolder}test.sig`);
 
-    const browser = await puppeteer.launch(launchOptions);
-
-    const page = await browser.newPage();
-
-    await page.setViewport({
-      width: 1366,
-      height: 768,
-    });
-    await page.setUserAgent(
-      'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36'
-    );
-
-    await page.goto('https://www.gosuslugi.ru/pgu/eds');
-    await page.evaluate(() => {
-      document.querySelector('a[name="currentAction"]').click();
-      document.querySelector('span[rel="2"]').click();
+    await page.type(`#captchaAnswer${captchaNumber}`, resolved.captchaAnswer, {
+      delay: 100,
     });
 
-    const images = await page.$$eval('.captcha-img', (anchors) =>
-      [].map.call(anchors, (img) => img.src)
-    );
-
-    const id = images[0].split('id=')[1];
-
-    return await val(id).then(async (resolved) => {
-      const fileInput = await page.$('input[name="document"]');
-      await fileInput.uploadFile(`${testFolder}test.sig`);
-
-      await page.type('#captchaAnswer2', resolved.captchaAnswer, {
-        delay: 100,
-      });
-
-      return await page
-        .waitForSelector('#elsign-result', {
-          timeout: 5000,
-        })
-        .then(async () => {
-          let element = await page.$('#elsign-result');
-          let value = await page.evaluate((el) => el.textContent, element);
-          const includesAss = value.replace(/\r?\n| /g, '').includes('НЕПОДТВЕРЖДЕНА');
-          if (includesAss) {
-            await browser.close();
-            console.log('подпись говно');
-            return {
-              status: false,
-            };
-          } else {
-            await browser.close();
-            return {
-              status: true,
-              sgn: value.split('Владелец :')[1].split('Издатель')[0],
-            };
-          }
-        })
-        .catch(async (e) => {
+    return await page
+      .waitForSelector('#elsign-result', {
+        timeout: 5000,
+      })
+      .then(async () => {
+        let element = await page.$('#elsign-result');
+        let value = await page.evaluate((el) => el.textContent, element);
+        const includesAss = value.replace(/\r?\n| /g, '').includes('НЕПОДТВЕРЖДЕНА');
+        if (includesAss) {
           await browser.close();
-          if (count > 1) {
-            console.log('на базе');
-            process.exit('проебался с капчей');
-          } else {
-            console.log('пидор');
-            return await uslugi(count + 1);
-          }
-        });
-    });
+          console.log('подпись говно');
+          return {
+            status: false,
+          };
+        } else {
+          await browser.close();
+          return {
+            status: true,
+            sgn: value.split('Владелец :')[1].split('Издатель')[0],
+          };
+        }
+      })
+      .catch(async (e) => {
+        await browser.close();
+        if (count > 1) {
+          console.log('на базе');
+          process.exit('проебался с капчей');
+        } else {
+          console.log('пидор');
+          return await uslugi(count + 1);
+        }
+      });
   }
 };
 
