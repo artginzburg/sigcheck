@@ -1,0 +1,3 @@
+module.exports = {
+  testFolder: './files/',
+};
