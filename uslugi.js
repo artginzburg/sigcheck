@@ -44,8 +44,8 @@ const val = async (id) => {
 };
 
 const puppeteerLaunchOptions = {
-  headless: false,
-  args: ['--start-maximized'],
+  // headless: false,
+  // args: ['--start-maximized'],
 };
 
 const uslugi = async (count = 1) => {
@@ -81,63 +81,51 @@ const uslugi = async (count = 1) => {
 
     const fileInput2 = await page.$('input[name="docDocument"]');
     await fileInput2.uploadFile(`${testFolder}test.sig`);
-
-    await page.type(`#captchaAnswer${captchaNumber}`, resolved.captchaAnswer, {
-      delay: 100,
-    });
-
-    await page.waitForSelector('#elsign-result', {
-      timeout: 5000,
-    });
-
-    try {
-      let element = await page.$('#elsign-result');
-      let value = await page.evaluate((el) => el.textContent, element);
-      return value;
-    } catch (error) {
-      console.log('Ошибка при получении текстового контекта результата');
-      throw error;
-    }
   } else {
     const fileInput = await page.$('input[name="document"]');
     await fileInput.uploadFile(`${testFolder}test.sig`);
+  }
 
+  try {
     await page.type(`#captchaAnswer${captchaNumber}`, resolved.captchaAnswer, {
-      delay: 100,
+      delay: 10,
     });
 
-    return await page
-      .waitForSelector('#elsign-result', {
-        timeout: 5000,
-      })
-      .then(async () => {
-        let element = await page.$('#elsign-result');
-        let value = await page.evaluate((el) => el.textContent, element);
-        const includesAss = value.replace(/\r?\n| /g, '').includes('НЕПОДТВЕРЖДЕНА');
-        if (includesAss) {
-          await browser.close();
-          console.log('подпись говно');
-          return {
-            status: false,
-          };
-        } else {
-          await browser.close();
-          return {
-            status: true,
-            sgn: value.split('Владелец :')[1].split('Издатель')[0],
-          };
-        }
-      })
-      .catch(async (e) => {
-        await browser.close();
-        if (count > 1) {
-          console.log('на базе');
-          process.exit('проебался с капчей');
-        } else {
-          console.log('пидор');
-          return await uslugi(count + 1);
-        }
+    try {
+      await page.waitForSelector('#elsign-result', {
+        timeout: 1000,
       });
+    } catch (err) {
+      throw 'Капча провалена';
+    }
+
+    const resultElement = await page.$('#elsign-result');
+    const resultValue = await page.evaluate((el) => el.textContent, resultElement);
+
+    if (namesArePdfSig) {
+      return resultValue;
+    }
+
+    browser.close();
+
+    const resultIsError = resultValue.replace(/\r?\n| /g, '').includes('НЕПОДТВЕРЖДЕНА');
+
+    const result = {
+      status: !resultIsError,
+    };
+
+    if (!resultIsError) {
+      result.sgn = resultValue.split('Владелец :')[1].split('Издатель')[0];
+    }
+
+    return result;
+  } catch (error) {
+    if (count > 2) {
+      console.log(`Провалил ${count} раз подряд, закругляюсь.`, error);
+    } else {
+      console.log(error, 'Попробую снова.');
+      return await uslugi(count + 1);
+    }
   }
 };
 
