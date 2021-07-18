@@ -1,25 +1,9 @@
-const { createWorker } = require('tesseract.js');
+const puppeteer = require('puppeteer');
 const fs = require('fs');
 
+const resolveCaptcha = require('./utils/resolveCaptcha.js');
+
 const { testFolder } = require('./constants.js');
-
-const worker = createWorker({});
-const puppeteer = require('puppeteer');
-
-const resolveCaptcha = async (url) => {
-  await worker.load();
-  await worker.loadLanguage('eng');
-  await worker.initialize('eng');
-  await worker.setParameters({
-    tessedit_char_whitelist: '0123456789',
-  });
-
-  const {
-    data: { text },
-  } = await worker.recognize(url);
-
-  return text;
-};
 
 const getAllFilesNames = () => {
   let files = fs.readdirSync(testFolder);
@@ -39,20 +23,19 @@ const getAllFilesNames = () => {
   }
 };
 
-const resolved = async (id) => {
-  return {
-    captchaAnswer: await resolveCaptcha('https://www.gosuslugi.ru/pgu/captcha/get?id=' + id),
-    captchaId: id,
-  };
-};
+const resolved = async (id) => ({
+  captchaAnswer: await resolveCaptcha(`https://www.gosuslugi.ru/pgu/captcha/get?id=${id}`),
+  captchaId: id,
+});
+
 const val = async (id) => {
   do {
     final = await resolved(id);
-    res = (await resolved(id)).captchaAnswer;
-    if (res.length == 6) {
+    res = final.captchaAnswer;
+    if (res.length === 6) {
       break;
     }
-  } while (!(res.length == 5));
+  } while (!(res.length === 5));
 
   return {
     ...final,
@@ -60,15 +43,14 @@ const val = async (id) => {
   };
 };
 
+const puppeteerLaunchOptions = {
+  headless: false,
+  args: ['--start-maximized'],
+};
+
 const uslugi = async (count = 1) => {
   if (getAllFilesNames() == 'pdfsig') {
-    let launchOptions = {
-      headless: false,
-      args: ['--start-maximized'],
-    };
-
-    const browser = await puppeteer.launch(launchOptions);
-
+    const browser = await puppeteer.launch(puppeteerLaunchOptions);
     const page = await browser.newPage();
 
     await page.setViewport({

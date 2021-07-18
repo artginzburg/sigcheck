@@ -1,6 +1,6 @@
 const uslugi = require('./uslugi.js');
 const cryptoPro = require('./cryptoPro.js');
 
-const { runParser } = require('./utils.js');
+const runParser = require('./utils/runParser.js');
 
-runParser(cryptoPro).finally(process.exit);
+runParser(uslugi).finally(process.exit);
