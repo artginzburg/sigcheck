@@ -13,8 +13,7 @@ module.exports = async function cryptoPro() {
   const fileInput = await page.$('input[name="SignatureFile"]');
   await fileInput.uploadFile(`${testFolder}test.sig`);
 
-  const submitButton = await page.$('#verify-button');
-  submitButton.click();
+  await page.click('#verify-button');
 
   await page.waitForSelector(resultSelector, {
     timeout: maximumPing,
