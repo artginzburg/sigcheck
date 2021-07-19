@@ -1,4 +1,10 @@
-module.exports = {
+const constants = {
   testFolder: './files/',
-  maximumPing: 1000,
+  maximumPing: 4000,
+  puppeteerLaunchOptions: {
+    headless: false,
+    // args: ['--start-maximized'],
+  },
 };
+
+module.exports = constants;

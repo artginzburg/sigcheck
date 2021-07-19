@@ -1,11 +1,15 @@
 const puppeteer = require('puppeteer');
-const { testFolder, maximumPing } = require('./constants.js');
+const { testFolder, maximumPing, puppeteerLaunchOptions } = require('./constants.js');
 
-const resultSelector = '#server-errors';
+const errorSelector = '#server-errors';
+const resultCheckerSelector = 'label[for="VerificationResults_0__Parameters_0__Description"]';
 const errorText = 'Произошла ошибка при проверке документа';
 
+const waitForSelectors = async (page, arr, ...rest) =>
+  await page.waitForSelector(arr.filter(Boolean).join(','), ...rest);
+
 module.exports = async function cryptoPro() {
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch(puppeteerLaunchOptions);
   const page = await browser.newPage();
 
   await page.goto('https://www.justsign.me/verifyqca/Verify/');
@@ -15,25 +19,41 @@ module.exports = async function cryptoPro() {
 
   await page.click('#verify-button');
 
-  await page.waitForSelector(resultSelector, {
+  await waitForSelectors(page, [resultCheckerSelector, errorSelector], {
     timeout: maximumPing,
   });
-  const resultElement = await page.$(resultSelector);
-  const resultValue = await page.evaluate((el) => el.textContent, resultElement);
-  browser.close();
 
-  if (!resultValue) {
-    throw 'Не удалось получить контект поля результата';
+  const errorElement = await page.$(errorSelector);
+
+  const thereIsNoError = !errorElement;
+
+  let readableResult = '';
+
+  if (thereIsNoError) {
+    const subjectElement = await page.$(
+      'label[for="VerificationResults_0__CertificateInfo_SubjectName"]'
+    );
+
+    const subjectValue = await page.evaluate((el) => el.parentElement.textContent, subjectElement);
+    const subject = subjectValue.split('Субъект')[1].trim();
+
+    readableResult = subject;
+  } else {
+    const errorValue = await page.evaluate((el) => el.textContent, errorElement);
+    browser.close();
+
+    if (!errorValue) {
+      throw 'Не удалось получить контент поля ошибки';
+    }
   }
 
-  const resultIsError = resultValue.includes(errorText);
+  const signIsFalse = typeof errorValue !== 'undefined' && errorValue.includes(errorText);
 
   const result = {
-    status: !resultIsError,
+    status: !signIsFalse,
   };
 
-  if (!resultIsError) {
-    const readableResult = resultValue.split('Владелец :')[1].split('Издатель')[0];
+  if (!signIsFalse) {
     result.sgn = readableResult;
   }
 

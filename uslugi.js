@@ -3,7 +3,7 @@ const fs = require('fs');
 
 const resolveCaptcha = require('./utils/resolveCaptcha.js');
 
-const { testFolder, maximumPing } = require('./constants.js');
+const { testFolder, maximumPing, puppeteerLaunchOptions } = require('./constants.js');
 
 const getAllFilesNames = () => {
   let files = fs.readdirSync(testFolder);
@@ -41,11 +41,6 @@ const val = async (id) => {
     ...final,
     captchaId: id,
   };
-};
-
-const puppeteerLaunchOptions = {
-  // headless: false,
-  // args: ['--start-maximized'],
 };
 
 const uslugi = async (count = 1) => {
@@ -102,11 +97,11 @@ const uslugi = async (count = 1) => {
     const resultElement = await page.$('#elsign-result');
     const resultValue = await page.evaluate((el) => el.textContent, resultElement);
 
+    browser.close();
+
     if (namesArePdfSig) {
       return resultValue;
     }
-
-    browser.close();
 
     const resultIsError = resultValue.replace(/\r?\n| /g, '').includes('НЕПОДТВЕРЖДЕНА');
 
