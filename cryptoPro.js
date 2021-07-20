@@ -21,6 +21,17 @@ module.exports = async function cryptoPro(browser) {
   const fileInput = await page.$('input[name="SignatureFile"]');
   await fileInput.uploadFile(`${testFolder}test.sig`);
 
+  if (testFolder.length > 1) {
+    await page.$eval('input[name="Detached"]', (e) => {
+      e.setAttribute("value", true);
+    });
+    fileInput2 = await page.evaluate(
+      (el) => el.nextElementSibling,
+      'input[name="DocumentFile"'
+    );
+    await fileInput2.uploadFile(`${testFolder}test.pdf`);
+  }
+
   await page.click("#verify-button");
 
   await waitForSelectors(page, [resultCheckerSelector, errorSelector], {
@@ -43,6 +54,7 @@ module.exports = async function cryptoPro(browser) {
       subjectElement
     );
     const subject = subjectValue.split("Субъект")[1].trim();
+    const allStatus = await page.$("div[class=readableResult]");
 
     readableResult = subject;
   } else {
@@ -56,7 +68,7 @@ module.exports = async function cryptoPro(browser) {
     }
   }
 
-  await page.close();
+  // await page.close();
 
   const signIsFalse =
     typeof errorValue !== "undefined" && errorValue.includes(errorText);
