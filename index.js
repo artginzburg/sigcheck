@@ -1,23 +1,29 @@
-const puppeteer = require("puppeteer");
+const cors = require('cors');
 
-const runParser = require("./utils/runParser.js");
+const app = require('express')();
+const port = 6969;
 
-const uslugi = require("./uslugi.js");
-const cryptoPro = require("./cryptoPro.js");
+const getSigns = require('./getSigns.js');
 
-const { puppeteerLaunchOptions } = require("./constants.js");
+const corsOptions = {
+  origin: '*',
+  methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'],
+  allowedHeaders: ['X-Requested-With', 'content-type'],
+  credentials: true,
+};
 
-async function test() {
-  const browser = await puppeteer.launch(puppeteerLaunchOptions);
+app.use(cors(corsOptions));
 
-  // console.log('Running cryptoPro...');
-  // await runParser(cryptoPro, browser);
+app.get('/', async (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
 
-  console.log("\n");
+  try {
+    const signs = await getSigns();
+    res.send(signs);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  }
+});
 
-  console.log("Running uslugi...");
-  await runParser(uslugi, browser);
-
-  process.exit();
-}
-test();
+app.listen(port, () => console.log(`Example app listening on port ${port}!`));
