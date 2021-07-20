@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index"
+    "start": "node index",
+    "serve": "nodemon"
   },
   "repository": {
     "type": "git",
@@ -17,7 +18,13 @@
   },
   "homepage": "https://github.com/kislyakovma/sigcheck#readme",
   "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
     "puppeteer": "^10.0.0",
     "tesseract.js": "^2.1.4"
+  },
+  "devDependencies": {
+    "dotenv": "^10.0.0",
+    "nodemon": "^2.0.9"
   }
 }
