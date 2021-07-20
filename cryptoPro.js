@@ -8,8 +8,7 @@ const errorText = 'Произошла ошибка при проверке до�
 const waitForSelectors = async (page, arr, ...rest) =>
   await page.waitForSelector(arr.filter(Boolean).join(','), ...rest);
 
-module.exports = async function cryptoPro() {
-  const browser = await puppeteer.launch(puppeteerLaunchOptions);
+module.exports = async function cryptoPro(browser) {
   const page = await browser.newPage();
 
   await page.goto('https://www.justsign.me/verifyqca/Verify/');
@@ -40,12 +39,13 @@ module.exports = async function cryptoPro() {
     readableResult = subject;
   } else {
     const errorValue = await page.evaluate((el) => el.textContent, errorElement);
-    browser.close();
 
     if (!errorValue) {
       throw 'Не удалось получить контент поля ошибки';
     }
   }
+
+  await page.close();
 
   const signIsFalse = typeof errorValue !== 'undefined' && errorValue.includes(errorText);
 

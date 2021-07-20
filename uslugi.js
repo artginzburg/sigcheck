@@ -1,9 +1,9 @@
-const puppeteer = require('puppeteer');
 const fs = require('fs');
+const puppeteer = require('puppeteer');
 
 const resolveCaptcha = require('./utils/resolveCaptcha.js');
 
-const { testFolder, maximumPing, puppeteerLaunchOptions } = require('./constants.js');
+const { testFolder, maximumPing } = require('./constants.js');
 
 const getAllFilesNames = () => {
   let files = fs.readdirSync(testFolder);
@@ -43,11 +43,10 @@ const val = async (id) => {
   };
 };
 
-const uslugi = async (count = 1) => {
+const uslugi = async (browser, count = 1) => {
   const namesArePdfSig = getAllFilesNames() === 'pdfsig';
   const captchaNumber = namesArePdfSig ? 3 : 2;
 
-  const browser = await puppeteer.launch(puppeteerLaunchOptions);
   const page = await browser.newPage();
 
   await page.setViewport({
@@ -59,7 +58,13 @@ const uslugi = async (count = 1) => {
   );
 
   await page.goto('https://www.gosuslugi.ru/pgu/eds');
-  await page.click('a[name="currentAction"]');
+
+  const currentActionLink = await page.$('a[name="currentAction"]');
+  if (!currentActionLink) {
+    throw 'На странице госуслуг отсутствует необходимая кнопка (ссылка)';
+  }
+
+  await currentActionLink.click();
   await page.click(`span[rel="${captchaNumber}"]`);
 
   const images = await page.$$eval('.captcha-img', (anchors) =>
@@ -86,6 +91,20 @@ const uslugi = async (count = 1) => {
       delay: 10,
     });
 
+    const serverErrorSelector = '.b-error';
+
+    try {
+      const isServerError = await page.waitForSelector(serverErrorSelector, {
+        timeout: 300,
+      });
+
+      if (isServerError) {
+        throw 'Ошибка на стороне сервера госуслуг';
+      }
+    } catch (error) {
+      throw error;
+    }
+
     try {
       await page.waitForSelector('#elsign-result', {
         timeout: maximumPing,
@@ -96,8 +115,6 @@ const uslugi = async (count = 1) => {
 
     const resultElement = await page.$('#elsign-result');
     const resultValue = await page.evaluate((el) => el.textContent, resultElement);
-
-    browser.close();
 
     if (namesArePdfSig) {
       return resultValue;
@@ -115,11 +132,12 @@ const uslugi = async (count = 1) => {
 
     return result;
   } catch (error) {
+    await page.close();
     if (count > 2) {
       console.log(`Провалил ${count} раз подряд, закругляюсь.`, error);
     } else {
       console.log(error, 'Попробую снова.');
-      return await uslugi(count + 1);
+      return await uslugi(browser, count + 1);
     }
   }
 };
