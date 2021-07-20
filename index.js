@@ -9,6 +9,7 @@ async function test() {
 
   console.log('\n');
 
+  console.log('Uslugi may not work right, need to fix that');
   console.log('Running uslugi...');
   await runParser(uslugi);
 

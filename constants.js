@@ -2,7 +2,7 @@ const constants = {
   testFolder: './files/',
   maximumPing: 4000,
   puppeteerLaunchOptions: {
-    headless: false,
+    // headless: false,
     // args: ['--start-maximized'],
   },
 };
