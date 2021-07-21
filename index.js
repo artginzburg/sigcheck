@@ -25,4 +25,4 @@ app.get('/', async (req_, res) => {
   }
 });
 
-app.listen(port, () => console.log(`API listening on port ${port}!`));
+app.listen(port, () => console.log(`API listening on http://localhost:${port} address!`));
