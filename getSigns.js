@@ -2,26 +2,20 @@ const puppeteer = require('puppeteer');
 
 const runParser = require('./utils/runParser.js');
 
-const gosUslugi = require('./gosUslugi.js');
-const cryptoPro = require('./cryptoPro.js');
-
-const { puppeteerLaunchOptions } = require('./constants.js');
+const { puppeteerLaunchOptions, activeParsers } = require('./constants.js');
 
 async function getSigns() {
   const browser = await puppeteer.launch(puppeteerLaunchOptions);
 
   const result = {};
-
-  console.log('Running cryptoPro...');
-  result.cryptoPro = await runParser(cryptoPro, browser);
-
-  console.log('\n');
-
-  console.log('Running gosUslugi...');
-  result.gosUslugi = await runParser(gosUslugi, browser);
+  for await (const parser of activeParsers) {
+    console.log(`Running ${parser}...`);
+    result[parser] = await runParser(require(`./${parser}.js`), browser);
+  }
 
   await browser.close();
 
+  console.log('Sent result: ', result);
   return result;
 }
 
