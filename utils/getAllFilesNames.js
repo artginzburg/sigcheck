@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const { testFolder } = require('../constants.js');
+const { testFolder } = require('../config.js');
 
 const getAllFilesNames = () => {
   let files = fs.readdirSync(testFolder);

@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 
 const runParser = require('./utils/runParser.js');
 
-const { puppeteerLaunchOptions, activeParsers } = require('./constants.js');
+const { puppeteerLaunchOptions, activeParsers } = require('./config.js');
 
 async function getSigns() {
   const browser = await puppeteer.launch(puppeteerLaunchOptions);
@@ -10,7 +10,7 @@ async function getSigns() {
   const result = {};
   for await (const parser of activeParsers) {
     console.log(`Running ${parser}...`);
-    result[parser] = await runParser(require(`./${parser}.js`), browser);
+    result[parser] = await runParser(require(`./parsers/${parser}.js`), browser);
   }
 
   await browser.close();

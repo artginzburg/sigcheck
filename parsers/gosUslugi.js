@@ -1,7 +1,7 @@
-const resolveCaptcha = require('./utils/resolveCaptcha.js');
-const getAllFilesNames = require('./utils/getAllFilesNames.js');
+const resolveCaptcha = require('../utils/resolveCaptcha.js');
+const getAllFilesNames = require('../utils/getAllFilesNames.js');
 
-const { testFolder, maximumPing, retryCaptcha } = require('./constants.js');
+const { testFolder, maximumPing, retryCaptcha } = require('../config.js');
 
 const resolved = async (id) => ({
   captchaAnswer: await resolveCaptcha(`https://www.gosuslugi.ru/pgu/captcha/get?id=${id}`),

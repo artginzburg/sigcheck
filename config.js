@@ -1,4 +1,4 @@
-const constants = {
+const config = {
   testFolder: './files/',
   activeParsers: ['gosUslugi', 'cryptoPro'],
   maximumPing: 3000,
@@ -8,4 +8,4 @@ const constants = {
   },
 };
 
-module.exports = constants;
+module.exports = config;
