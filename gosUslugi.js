@@ -23,7 +23,7 @@ const val = async (id) => {
   };
 };
 
-const uslugi = async (browser, count = 1) => {
+const gosUslugi = async (browser, count = 1) => {
   const namesArePdfSig = getAllFilesNames() === 'pdfsig';
   const captchaNumber = namesArePdfSig ? 3 : 2;
 
@@ -116,9 +116,9 @@ const uslugi = async (browser, count = 1) => {
       return { status: 'error' };
     } else {
       console.log(error, 'Попробую снова.');
-      return await uslugi(browser, count + 1);
+      return await gosUslugi(browser, count + 1);
     }
   }
 };
 
-module.exports = uslugi;
+module.exports = gosUslugi;

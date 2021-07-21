@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 
 const runParser = require('./utils/runParser.js');
 
-const uslugi = require('./uslugi.js');
+const gosUslugi = require('./gosUslugi.js');
 const cryptoPro = require('./cryptoPro.js');
 
 const { puppeteerLaunchOptions } = require('./constants.js');
@@ -17,8 +17,8 @@ async function getSigns() {
 
   console.log('\n');
 
-  console.log('Running uslugi...');
-  result.gosUslugi = await runParser(uslugi, browser);
+  console.log('Running gosUslugi...');
+  result.gosUslugi = await runParser(gosUslugi, browser);
 
   await browser.close();
 
