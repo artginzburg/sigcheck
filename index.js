@@ -1,14 +1,15 @@
 const app = require('express')();
 const cors = require('cors');
 
-const { corsOptions, port } = require('./serverConfig.js');
+const { corsOptions } = require('./serverConfig.js');
+
+const { PORT = 6969, NODE_ENV = 'production' } = process.env;
 
 const getSigns = require('./getSigns.js');
 
-const devMode = process.env.NODE_ENV === 'development';
-if (devMode) {
-  getSigns().then(console.log);
-  return;
+const developmentMode = NODE_ENV === 'development';
+if (developmentMode) {
+  return getSigns().then(console.log);
 }
 
 app.use(cors(corsOptions));
@@ -25,4 +26,4 @@ app.get('/', async (req_, res) => {
   }
 });
 
-app.listen(port, () => console.log(`API listening on http://localhost:${port} address!`));
+app.listen(PORT, () => console.log(`API listening on http://localhost:${PORT} address!`));

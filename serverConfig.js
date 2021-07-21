@@ -5,7 +5,6 @@ const serverConfig = {
     allowedHeaders: ['X-Requested-With', 'content-type'],
     credentials: true,
   },
-  port: 6969,
 };
 
 module.exports = serverConfig;
