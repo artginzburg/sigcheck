@@ -2,7 +2,7 @@ const fs = require('fs');
 
 const { testFolder } = require('../config.js');
 
-const getAllFilesNames = () => {
+module.exports = function getAllFilesNames() {
   let files = fs.readdirSync(testFolder);
   if (
     files.length == 1 &&
@@ -18,5 +18,3 @@ const getAllFilesNames = () => {
     return 'tosig';
   }
 };
-
-module.exports = getAllFilesNames;

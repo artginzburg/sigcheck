@@ -1,12 +1,11 @@
-const corsOptions = {
-  origin: '*',
-  methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'],
-  allowedHeaders: ['X-Requested-With', 'content-type'],
-  credentials: true,
+const serverConfig = {
+  corsOptions: {
+    origin: '*',
+    methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'],
+    allowedHeaders: ['X-Requested-With', 'content-type'],
+    credentials: true,
+  },
+  port: 6969,
 };
-const port = 6969;
 
-module.exports = {
-  corsOptions,
-  port,
-};
+module.exports = serverConfig;

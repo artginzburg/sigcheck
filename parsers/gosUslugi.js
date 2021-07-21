@@ -1,29 +1,9 @@
-const resolveCaptcha = require('../utils/resolveCaptcha.js');
+const { val } = require('../utils/resolveCaptcha.js');
 const getAllFilesNames = require('../utils/getAllFilesNames.js');
 
 const { testFolder, maximumPing, retryCaptcha } = require('../config.js');
 
-const resolved = async (id) => ({
-  captchaAnswer: await resolveCaptcha(`https://www.gosuslugi.ru/pgu/captcha/get?id=${id}`),
-  captchaId: id,
-});
-
-const val = async (id) => {
-  do {
-    final = await resolved(id);
-    res = final.captchaAnswer;
-    if (res.length === 6) {
-      break;
-    }
-  } while (!(res.length === 5));
-
-  return {
-    ...final,
-    captchaId: id,
-  };
-};
-
-const gosUslugi = async (browser, count = 1) => {
+module.exports = async function gosUslugi(browser, count = 1) {
   const namesArePdfSig = getAllFilesNames() === 'pdfsig';
   const captchaNumber = namesArePdfSig ? 3 : 2;
 
@@ -120,5 +100,3 @@ const gosUslugi = async (browser, count = 1) => {
     }
   }
 };
-
-module.exports = gosUslugi;
