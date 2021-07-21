@@ -1,7 +1,7 @@
+const app = require('express')();
 const cors = require('cors');
 
-const app = require('express')();
-const port = 6969;
+const { corsOptions, port } = require('./serverConfig.js');
 
 const getSigns = require('./getSigns.js');
 
@@ -10,13 +10,6 @@ if (devMode) {
   getSigns().then(console.log);
   return;
 }
-
-const corsOptions = {
-  origin: '*',
-  methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'],
-  allowedHeaders: ['X-Requested-With', 'content-type'],
-  credentials: true,
-};
 
 app.use(cors(corsOptions));
 
