@@ -5,6 +5,12 @@ const port = 6969;
 
 const getSigns = require('./getSigns.js');
 
+const devMode = process.env.NODE_ENV === 'development';
+if (devMode) {
+  getSigns().then(console.log);
+  return;
+}
+
 const corsOptions = {
   origin: '*',
   methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'],
@@ -14,7 +20,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-app.get('/', async (req, res) => {
+app.get('/', async (req_, res) => {
   res.setHeader('Content-Type', 'application/json');
 
   try {
@@ -22,8 +28,8 @@ app.get('/', async (req, res) => {
     res.send(signs);
   } catch (error) {
     console.error(error);
-    res.status(500).send('Server error');
+    res.status(500).send(`Server error: ${error}`);
   }
 });
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+app.listen(port, () => console.log(`API listening on port ${port}!`));

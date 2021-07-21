@@ -1,37 +1,10 @@
-const fs = require("fs");
-const puppeteer = require("puppeteer");
+const resolveCaptcha = require('./utils/resolveCaptcha.js');
+const getAllFilesNames = require('./utils/getAllFilesNames.js');
 
-const resolveCaptcha = require("./utils/resolveCaptcha.js");
-
-const { testFolder, maximumPing } = require("./constants.js");
-
-const getAllFilesNames = () => {
-  let files = fs.readdirSync(testFolder);
-  if (
-    files.length == 1 &&
-    !(
-      files.filter((file) => !["sig", "pdf"].includes(file.split(".")[1]))
-        .length > 0
-    )
-  ) {
-    return "sig";
-  } else if (
-    files.length == 2 &&
-    !(
-      files.filter((file) => !["sig", "pdf"].includes(file.split(".")[1]))
-        .length > 0
-    )
-  ) {
-    return "pdfsig";
-  } else {
-    return "tosig";
-  }
-};
+const { testFolder, maximumPing, retryCaptcha } = require('./constants.js');
 
 const resolved = async (id) => ({
-  captchaAnswer: await resolveCaptcha(
-    `https://www.gosuslugi.ru/pgu/captcha/get?id=${id}`
-  ),
+  captchaAnswer: await resolveCaptcha(`https://www.gosuslugi.ru/pgu/captcha/get?id=${id}`),
   captchaId: id,
 });
 
@@ -51,7 +24,7 @@ const val = async (id) => {
 };
 
 const uslugi = async (browser, count = 1) => {
-  const namesArePdfSig = getAllFilesNames() === "pdfsig";
+  const namesArePdfSig = getAllFilesNames() === 'pdfsig';
   const captchaNumber = namesArePdfSig ? 3 : 2;
 
   const page = await browser.newPage();
@@ -61,24 +34,24 @@ const uslugi = async (browser, count = 1) => {
     height: 768,
   });
   await page.setUserAgent(
-    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36"
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36'
   );
 
-  await page.goto("https://www.gosuslugi.ru/pgu/eds");
+  await page.goto('https://www.gosuslugi.ru/pgu/eds');
 
   const currentActionLink = await page.$('a[name="currentAction"]');
   if (!currentActionLink && count == 1) {
-    throw "На странице госуслуг отсутствует необходимая кнопка (ссылка)";
+    throw 'На странице госуслуг отсутствует необходимая кнопка (ссылка)';
   }
 
   currentActionLink && (await currentActionLink.click());
   await page.click(`span[rel="${captchaNumber}"]`);
 
-  const images = await page.$$eval(".captcha-img", (anchors) =>
+  const images = await page.$$eval('.captcha-img', (anchors) =>
     [].map.call(anchors, (img) => img.src)
   );
 
-  const id = images[0].split("id=")[1];
+  const id = images[0].split('id=')[1];
 
   const resolved = await val(id);
 
@@ -113,42 +86,36 @@ const uslugi = async (browser, count = 1) => {
     // }
 
     try {
-      await page.waitForSelector("#elsign-result", {
+      await page.waitForSelector('#elsign-result', {
         timeout: maximumPing,
       });
     } catch (err) {
-      throw "Капча провалена";
+      throw 'Капча провалена';
     }
 
-    const resultElement = await page.$("#elsign-result");
-    const resultValue = await page.evaluate(
-      (el) => el.textContent,
-      resultElement
-    );
+    const resultElement = await page.$('#elsign-result');
+    const resultValue = await page.evaluate((el) => el.textContent, resultElement);
 
-    const resultIsError = resultValue
-      .replace(/\r?\n| /g, "")
-      .includes("НЕПОДТВЕРЖДЕНА");
+    await page.close();
 
-    let result = {
+    const resultIsError = resultValue.replace(/\r?\n| /g, '').includes('НЕПОДТВЕРЖДЕНА');
+
+    const result = {
       status: !resultIsError,
     };
 
     if (!resultIsError) {
-      result = {
-        ...result,
-        sgn: resultValue.split("Владелец :")[1].split("Издатель")[0],
-      };
+      result.sgn = resultValue.split('Владелец :')[1].split('Издатель')[0].trim();
     }
 
     return result;
   } catch (error) {
     await page.close();
-    if (count > 10) {
+    if (count > retryCaptcha) {
       console.log(`Провалил ${count} раз подряд, закругляюсь.`, error);
-      return { status: "error" };
+      return { status: 'error' };
     } else {
-      console.log(error, "Попробую снова.");
+      console.log(error, 'Попробую снова.');
       return await uslugi(browser, count + 1);
     }
   }

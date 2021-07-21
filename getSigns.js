@@ -12,16 +12,15 @@ async function getSigns() {
 
   const result = {};
 
-  // console.log('Running cryptoPro...');
+  console.log('Running cryptoPro...');
   result.cryptoPro = await runParser(cryptoPro, browser);
 
-  // console.log('\n');
+  console.log('\n');
 
-  // console.log('Running uslugi...');
+  console.log('Running uslugi...');
   result.gosUslugi = await runParser(uslugi, browser);
 
-  console.log('сука результат подо мной');
-  console.log(result);
+  await browser.close();
 
   return result;
 }
