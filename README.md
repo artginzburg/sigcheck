@@ -1,11 +1,3 @@
 ### For macOS to stop showing the puppeteer firewall popup:
 
-```powershell
-sudo codesign --force --deep --sign - ./node_modules/puppeteer/.local-chromium/
-```
-
-Press <kbd>Tab</kbd> 3 times · <kbd>Enter</kbd>
-
-> On the next Chromium launch, click `Allow` in the popup.
-
-Reference: [https://github.com/puppeteer/puppeteer/issues/4752](puppeteer#4752)
+Follow instructions at [artginzburg/puppeteer-chromium-macOS-Firewall-popup-stop.md](https://gist.github.com/artginzburg/3b8aa0a8d394b12d7326ee761eddfc2f)
