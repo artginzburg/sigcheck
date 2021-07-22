@@ -14,7 +14,7 @@ const upload = multer({
 const fsExtra = require("fs-extra");
 
 const app = require("express")();
-const port = 6969;
+const PORT = 6969;
 
 const getSigns = require("./getSigns.js");
 
