@@ -9,14 +9,14 @@ const errorText = 'Произошла ошибка при проверке до�
 const waitForSelectors = async (page, arr, ...rest) =>
   await page.waitForSelector(arr.filter(Boolean).join(','), ...rest);
 
-module.exports = async function cryptoPro(browser) {
-  const namesArePdfSig = getAllFilesNames() === 'pdfsig';
+module.exports = async function cryptoPro(browser, count, pathName) {
+  const namesArePdfSig = getAllFilesNames(pathName) === 'pdfsig';
   const page = await browser.newPage();
 
   await page.goto('https://www.justsign.me/verifyqca/Verify/');
 
   const fileInput = await page.$('input[name="SignatureFile"]');
-  await fileInput.uploadFile(`${testFolder}test.sig`);
+  await fileInput.uploadFile(`${pathName}test.sig`);
 
   if (namesArePdfSig) {
     await page.click('a[href="#signature-parameters"]');
@@ -38,7 +38,7 @@ module.exports = async function cryptoPro(browser) {
     const fileInput2Element = await page.$('input[name="DocumentFile"]');
 
     const fileInput2 = await page.evaluateHandle((el) => el.nextElementSibling, fileInput2Element);
-    await fileInput2.uploadFile(`${testFolder}test.pdf`);
+    await fileInput2.uploadFile(`${pathName}test.pdf`);
   }
 
   await page.click('#verify-button');

@@ -4,13 +4,13 @@ const runParser = require('./utils/runParser.js');
 
 const { puppeteerLaunchOptions, activeParsers } = require('./config.js');
 
-async function getSigns() {
+async function getSigns(pathName) {
   const browser = await puppeteer.launch(puppeteerLaunchOptions);
-
+  console.log(pathName + '1');
   const result = {};
   for await (const parser of activeParsers) {
     console.log(`Running ${parser}...`);
-    result[parser] = await runParser(require(`./parsers/${parser}.js`), browser);
+    result[parser] = await runParser(require(`./parsers/${parser}.js`), browser, pathName);
   }
 
   await browser.close();

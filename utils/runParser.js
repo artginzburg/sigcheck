@@ -1,6 +1,7 @@
-module.exports = async function runParser(parser, browser) {
+module.exports = async function runParser(parser, browser, pathName) {
   try {
-    const result = await parser(browser);
+    console.log(pathName + '2');
+    const result = await parser(browser,1, pathName);
     return result;
     console.log(result);
   } catch (error) {
