@@ -4,7 +4,7 @@ const config = {
   maximumPing: 5000,
   retryCaptcha: 9,
   puppeteerLaunchOptions: {
-    headless: false,
+    // headless: false,
   },
 };
 
