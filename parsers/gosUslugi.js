@@ -3,8 +3,8 @@ const getAllFilesNames = require('../utils/getAllFilesNames.js');
 
 const { testFolder, maximumPing, retryCaptcha } = require('../config.js');
 
-module.exports = async function gosUslugi(browser, count = 1) {
-  const namesArePdfSig = getAllFilesNames() === 'pdfsig';
+module.exports = async function gosUslugi(browser, count = 1, pathName) {
+  const namesArePdfSig = getAllFilesNames(pathName) === 'pdfsig';
   const captchaNumber = namesArePdfSig ? 3 : 2;
 
   const page = await browser.newPage();
@@ -37,13 +37,13 @@ module.exports = async function gosUslugi(browser, count = 1) {
 
   if (namesArePdfSig) {
     const fileInput = await page.$('input[name="docSignature"]');
-    await fileInput.uploadFile(`${testFolder}test.pdf`);
+    await fileInput.uploadFile(`${pathName}test.pdf`);
 
     const fileInput2 = await page.$('input[name="docDocument"]');
-    await fileInput2.uploadFile(`${testFolder}test.sig`);
+    await fileInput2.uploadFile(`${pathName}test.sig`);
   } else {
     const fileInput = await page.$('input[name="document"]');
-    await fileInput.uploadFile(`${testFolder}test.sig`);
+    await fileInput.uploadFile(`${pathName}test.sig`);
   }
 
   try {
@@ -96,7 +96,7 @@ module.exports = async function gosUslugi(browser, count = 1) {
       return { status: 'error' };
     } else {
       console.log(error, 'Попробую снова.');
-      return await gosUslugi(browser, count + 1);
+      return await gosUslugi(browser, count + 1, pathName);
     }
   }
 };
