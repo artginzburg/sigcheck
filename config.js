@@ -1,10 +1,10 @@
 const config = {
-  testFolder: './files/',
-  activeParsers: ['cryptoPro', 'gosUslugi' ],
-  maximumPing: 3000,
-  retryCaptcha: 10,
+  testFolder: "./files/",
+  activeParsers: ["cryptoPro", "gosUslugi"],
+  maximumPing: 5000,
+  retryCaptcha: 9,
   puppeteerLaunchOptions: {
-    // headless: false,
+    headless: false,
   },
 };
 

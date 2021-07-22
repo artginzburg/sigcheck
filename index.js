@@ -1,12 +1,11 @@
 const cors = require("cors");
 const multer = require("multer");
-const { v4: uuidv4 } = require('uuid');
-const fs = require('fs')
+const { v4: uuidv4 } = require("uuid");
+const fs = require("fs");
 
 var storage = multer.diskStorage({
-  
   destination: function (req, file, callback) {
-    fs.mkdirSync(req.body.path, { recursive: true })
+    fs.mkdirSync(req.body.path, { recursive: true });
     callback(null, `./${req.body.path}/`);
   },
   filename: function (req, file, cb) {
@@ -51,7 +50,6 @@ app.get("/", async (req_, res) => {
 });
 
 app.post("/check", upload.array("toCheck", 2), async (req, res) => {
-
   res.setHeader("Content-Type", "application/json");
   try {
     const signs = await getSigns(`./${req.body.path}/`);
