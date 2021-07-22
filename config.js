@@ -1,5 +1,6 @@
-const constants = {
+const config = {
   testFolder: './files/',
+  activeParsers: ['gosUslugi', 'cryptoPro'],
   maximumPing: 3000,
   retryCaptcha: 10,
   puppeteerLaunchOptions: {
@@ -7,4 +8,4 @@ const constants = {
   },
 };
 
-module.exports = constants;
+module.exports = config;

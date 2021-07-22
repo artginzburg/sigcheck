@@ -57,4 +57,6 @@ app.post("/check", upload.array("toCheck", 2), async (req, res) => {
   }
 });
 
-app.listen(port, () => console.log(`API listening on port ${port}!`));
+app.listen(PORT, () =>
+  console.log(`API listening on http://localhost:${PORT} address!`)
+);
