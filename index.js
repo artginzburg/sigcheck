@@ -6,15 +6,38 @@ const fsExtra = require('fs-extra');
 const time = require('express-timestamp');
 const axios = require('axios');
 const FormData = require('form-data');
+const rimraf = require('rimraf');
 
 const getSigns = require('./getSigns.js');
 
-const app = require('express')();
+const uploadsPath = './uploads/';
 
 const PORT = 6969;
 
+async function testFileSend(length) {
+  const form = new FormData();
+
+  const data = fs.createReadStream('./test.sig');
+
+  form.append('toCheck', data);
+
+  try {
+    const response = await axios({
+      method: 'post',
+      url: 'http://localhost:6969/check',
+      data: form,
+      headers: {
+        'Content-Type': `multipart/form-data; boundary=${form._boundary}`,
+      },
+    });
+  } catch (error) {
+    const stringError = String(error);
+    fs.writeFile(`./test${uuidv4()}.log`, stringError, () => {});
+  }
+}
+
 function makeFolderedPath(filepath) {
-  return `./${filepath}/`;
+  return `${uploadsPath}${filepath}/`;
 }
 
 const reqToHash = function (req) {
@@ -74,10 +97,10 @@ var storage = multer.diskStorage({
   destination: function (req, file, callback) {
     // console.log(file);
     // return;
-    const filepath = reqToHash(req);
+    const filepath = makeFolderedPath(reqToHash(req));
 
     fs.mkdirSync(filepath, { recursive: true });
-    callback(null, makeFolderedPath(filepath));
+    callback(null, filepath);
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname);
@@ -88,11 +111,9 @@ const upload = multer({
   storage: storage,
 });
 
-// const devMode = process.env.NODE_ENV === 'development';
-// if (devMode) {
-//   getSigns().then(console.log);
-//   return;
-// }
+// APP INITIALIZING
+
+const app = require('express')();
 
 const corsOptions = {
   origin: '*',
@@ -100,18 +121,17 @@ const corsOptions = {
   allowedHeaders: ['X-Requested-With', 'content-type'],
   credentials: true,
 };
+app.use(cors(corsOptions));
 
 app.use(time.init);
-
-app.use(cors(corsOptions));
 
 app.post('/check', upload.array('toCheck', 2), async (req, res) => {
   res.setHeader('Content-Type', 'application/json');
 
-  const filepath = reqToHash(req);
+  const filepath = makeFolderedPath(reqToHash(req));
 
   try {
-    const signs = await getSigns(makeFolderedPath(filepath));
+    const signs = await getSigns(filepath);
     res.send(signs);
     fsExtra.removeSync(filepath);
   } catch (error) {
@@ -120,45 +140,28 @@ app.post('/check', upload.array('toCheck', 2), async (req, res) => {
   }
 });
 
-async function testFileSend(length) {
-  // fs.readFile('./test.sig', {}, (err, data) => {
-  //   console.log(data);
-  // });
-
-  const form = new FormData();
-
-  const data = fs.createReadStream('./test.sig');
-
-  form.append('toCheck', data);
-
-  try {
-    const response = await axios({
-      method: 'post',
-      url: 'http://localhost:6969/check',
-      data: form,
-      headers: {
-        'Content-Type': `multipart/form-data; boundary=${form._boundary}`,
-        // 'Content-Length': data.length,
-      },
-    });
-  } catch (error) {
-    const stringError = String(error);
-    fs.writeFile(`./test${uuidv4()}.log`, stringError, () => {});
-  }
-
-  // console.log(response);
+if (fs.existsSync(uploadsPath)) {
+  rimraf(uploadsPath, console.log);
+}
+const traineddatapath = './eng.traineddata';
+if (fs.existsSync(traineddatapath)) {
+  fs.unlinkSync(traineddatapath);
 }
 
 app.listen(PORT, () => {
   console.log(`API listening on http://localhost:${PORT} address!`);
 
+  // running test after the app is loaded
+  const requestsQuantity = 2;
+  const requestsInterval = 2000;
+
   let i = 0;
   var refreshId = setInterval(() => {
-    if (i > 2) {
+    if (i >= requestsQuantity) {
       clearInterval(refreshId);
       return;
     }
     i++;
     testFileSend();
-  }, 500);
+  }, requestsInterval);
 });
