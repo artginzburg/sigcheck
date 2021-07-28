@@ -149,28 +149,16 @@ async function testFileSend(length) {
   // console.log(response);
 }
 
-// for (let i = 0; i < 5; i++) {
-//   sleep();
-//   // async () => await setTimeout(() => testFileSend(), 300);
-// }
+app.listen(PORT, () => {
+  console.log(`API listening on http://localhost:${PORT} address!`);
 
-let i = 0;
-
-var refreshId = setInterval(() => {
-  if (i > 2) {
-    clearInterval(refreshId);
-    return;
-  }
-  i++;
-  testFileSend();
-}, 2000);
-
-// function timeout(ms) {
-//   return new Promise((resolve) => setTimeout(resolve, ms));
-// }
-// async function sleep(fn, ...args) {
-//   await timeout(3000);
-//   return fn(...args);
-// }
-
-app.listen(PORT, () => console.log(`API listening on http://localhost:${PORT} address!`));
+  let i = 0;
+  var refreshId = setInterval(() => {
+    if (i > 2) {
+      clearInterval(refreshId);
+      return;
+    }
+    i++;
+    testFileSend();
+  }, 500);
+});
