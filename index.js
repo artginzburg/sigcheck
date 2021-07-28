@@ -134,6 +134,12 @@ app.post('/check', upload.array('toCheck', 2), async (req, res) => {
     const signs = await getSigns(filepath);
     res.send(signs);
     fsExtra.removeSync(filepath);
+
+    try {
+      fs.rmdirSync(uploadsPath);
+    } catch (error) {
+      if (error.code === 'ENOTEMPTY') console.log(`There is leftover trash in ${uploadsPath}`);
+    }
   } catch (error) {
     console.error(error);
     res.status(500).send(`Server error: ${error}`);
