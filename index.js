@@ -12,6 +12,16 @@ const express = require('express');
 const getSigns = require('./getSigns.js');
 const { PORT, paths, ...serverConfig } = require('./serverConfig.js');
 
+function removeLeftovers() {
+  if (fs.existsSync(paths.uploads)) {
+    rimraf(paths.uploads, console.log);
+  }
+  const traineddatapath = './eng.traineddata';
+  if (fs.existsSync(traineddatapath)) {
+    fs.unlinkSync(traineddatapath);
+  }
+}
+
 async function testFileSend() {
   const form = new FormData();
 
@@ -35,6 +45,22 @@ async function testFileSend() {
   }
 }
 
+function runTests() {
+  // running test after the app is loaded
+  const requestsQuantity = 5;
+  const requestsInterval = 3000;
+
+  let i = 0;
+  var refreshId = setInterval(() => {
+    if (i >= requestsQuantity) {
+      clearInterval(refreshId);
+      return;
+    }
+    i++;
+    testFileSend();
+  }, requestsInterval);
+}
+
 function makeFolderedPath() {
   return `${paths.uploads}${uuidv4()}/`;
 }
@@ -55,15 +81,7 @@ const upload = multer({
   storage: storage,
 });
 
-// INITIALIZING APP
-
-const app = express();
-
-app.use(cors(serverConfig.corsOptions));
-
-app.use(time.init);
-
-app.post('/check', upload.array('toCheck', 2), async (req, res) => {
+const postCheckAfterUploadCallback = async (req, res) => {
   res.setHeader('Content-Type', 'application/json');
 
   const filepath = req.files[0].destination;
@@ -82,30 +100,22 @@ app.post('/check', upload.array('toCheck', 2), async (req, res) => {
     console.error(error);
     res.status(500).send(`Server error: ${error}`);
   }
-});
+};
 
-if (fs.existsSync(paths.uploads)) {
-  rimraf(paths.uploads, console.log);
-}
-const traineddatapath = './eng.traineddata';
-if (fs.existsSync(traineddatapath)) {
-  fs.unlinkSync(traineddatapath);
-}
+// INITIALIZING APP
+
+const app = express();
+
+app.use(cors(serverConfig.corsOptions));
+
+app.use(time.init);
+
+app.post('/check', upload.array('toCheck', 2), postCheckAfterUploadCallback);
+
+removeLeftovers();
 
 app.listen(PORT, () => {
   console.log(`API listening on http://localhost:${PORT} address!`);
 
-  // running test after the app is loaded
-  const requestsQuantity = 5;
-  const requestsInterval = 3000;
-
-  let i = 0;
-  var refreshId = setInterval(() => {
-    if (i >= requestsQuantity) {
-      clearInterval(refreshId);
-      return;
-    }
-    i++;
-    testFileSend();
-  }, requestsInterval);
+  runTests();
 });
