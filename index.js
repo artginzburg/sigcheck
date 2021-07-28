@@ -10,7 +10,11 @@ const rimraf = require('rimraf');
 const express = require('express');
 
 const getSigns = require('./getSigns.js');
-const { PORT, paths, ...serverConfig } = require('./serverConfig.js');
+const { PORT, paths, routes, ...serverConfig } = require('./serverConfig.js');
+
+const hostForLog = process.env.HOST ?? 'localhost';
+
+const address = `http://${hostForLog}:${PORT}`;
 
 function removeLeftovers() {
   if (fs.existsSync(paths.uploads)) {
@@ -33,7 +37,7 @@ async function testFileSend() {
     // const response =
     await axios({
       method: 'post',
-      url: 'http://localhost:6969/check',
+      url: `${address}${routes.check}`,
       data: form,
       headers: {
         'Content-Type': `multipart/form-data; boundary=${form._boundary}`,
@@ -110,12 +114,12 @@ app.use(cors(serverConfig.corsOptions));
 
 app.use(time.init);
 
-app.post('/check', upload.array('toCheck', 2), postCheckAfterUploadCallback);
+app.post(routes.check, upload.array('toCheck', 2), postCheckAfterUploadCallback);
 
 removeLeftovers();
 
 app.listen(PORT, () => {
-  console.log(`API listening on http://localhost:${PORT} address!`);
+  console.log(`API listening on ${address} address!`);
 
   runTests();
 });

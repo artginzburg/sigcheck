@@ -10,6 +10,9 @@ const serverConfig = {
   paths: {
     uploads: './uploads/',
   },
+  routes: {
+    check: '/check',
+  },
   PORT,
 };
 
