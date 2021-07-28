@@ -128,7 +128,8 @@ app.use(time.init);
 app.post('/check', upload.array('toCheck', 2), async (req, res) => {
   res.setHeader('Content-Type', 'application/json');
 
-  const filepath = makeFolderedPath(reqToHash(req));
+  const filepath = req.files[0].destination;
+  // makeFolderedPath(reqToHash(req));
 
   try {
     const signs = await getSigns(filepath);
@@ -158,8 +159,8 @@ app.listen(PORT, () => {
   console.log(`API listening on http://localhost:${PORT} address!`);
 
   // running test after the app is loaded
-  const requestsQuantity = 2;
-  const requestsInterval = 2000;
+  const requestsQuantity = 5;
+  const requestsInterval = 3000;
 
   let i = 0;
   var refreshId = setInterval(() => {
