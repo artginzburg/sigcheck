@@ -51,7 +51,7 @@ async function testFileSend() {
 
 function runTests() {
   // running test after the app is loaded
-  const requestsQuantity = 5;
+  const requestsQuantity = 4;
   const requestsInterval = 3000;
 
   let i = 0;

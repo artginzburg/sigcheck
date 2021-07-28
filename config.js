@@ -1,5 +1,4 @@
 const parserConfig = {
-  testFolder: './files/',
   activeParsers: ['cryptoPro', 'gosUslugi'],
   maximumPing: 5000,
   retryCaptcha: 9,
