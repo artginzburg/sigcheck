@@ -30,6 +30,7 @@ async function testFileSend() {
   const form = new FormData();
 
   const testFile = fs.createReadStream('./test.sig');
+  const logDirectory = './logs/';
 
   form.append('toCheck', testFile);
 
@@ -45,7 +46,8 @@ async function testFileSend() {
     });
   } catch (error) {
     const stringError = String(error);
-    fs.writeFile(`./test${uuidv4()}.log`, stringError, () => {});
+    fs.mkdirSync(logDirectory, { recursive: true });
+    fs.writeFileSync(`${logDirectory}test${uuidv4()}.log`, stringError);
   }
 }
 
@@ -108,6 +110,8 @@ const postCheckAfterUploadCallback = async (req, res) => {
 
 // INITIALIZING APP
 
+removeLeftovers();
+
 const app = express();
 
 app.use(cors(serverConfig.corsOptions));
@@ -115,8 +119,6 @@ app.use(cors(serverConfig.corsOptions));
 app.use(time.init);
 
 app.post(routes.check, upload.array('toCheck', 2), postCheckAfterUploadCallback);
-
-removeLeftovers();
 
 app.listen(PORT, () => {
   console.log(`API listening on ${address} address!`);
