@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "NODE_ENV=development nodemon -q",
-    "prod": "node index"
+    "prod": "node index",
+    "cleanup": "rm -rf ./uploads && rm -rf ./logs && rm -f eng.traineddata && echo 'Cleanup succeed'"
   },
   "repository": {
     "type": "git",
