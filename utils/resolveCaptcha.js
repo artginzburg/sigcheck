@@ -1,21 +1,12 @@
-const { createWorker } = require('tesseract.js');
-const worker = createWorker();
+const { worker, workerConfiguredLoad } = require('./worker');
 
 const baseUrl = 'https://www.gosuslugi.ru';
 const captchaUrl = new URL('/pgu/captcha/get', baseUrl);
 
 const captchaLength = 5;
-const captchaSymbols = '0123456789';
-
-const workerLanguage = 'eng';
 
 const resolveThroughWorker = async (url) => {
-  await worker.load();
-  await worker.loadLanguage(workerLanguage);
-  await worker.initialize(workerLanguage);
-  await worker.setParameters({
-    tessedit_char_whitelist: captchaSymbols,
-  });
+  await workerConfiguredLoad();
 
   const {
     data: { text },
