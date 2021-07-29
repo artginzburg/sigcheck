@@ -6,8 +6,8 @@ const FormData = require('form-data');
 
 const { paths, routes, formdataNames, address } = require('./serverConfig');
 
-const requestsQuantity = 10;
-const requestsInterval = 4000;
+const requestsQuantity = 20;
+const requestsInterval = 10;
 
 function removeLeftovers() {
   if (fs.existsSync(paths.uploads)) {
@@ -19,7 +19,7 @@ function removeLeftovers() {
   }
 }
 
-async function testFileSend() {
+async function testFileSend(indexInfo) {
   const form = new FormData();
 
   const testFile = fs.createReadStream('./test.sig');
@@ -27,9 +27,10 @@ async function testFileSend() {
 
   form.append(formdataNames.check, testFile);
 
+  const requestName = `Request ${indexInfo}`;
+
   try {
-    // const response =
-    await axios({
+    const response = await axios({
       method: 'post',
       url: `${address}${routes.check}`,
       data: form,
@@ -37,10 +38,21 @@ async function testFileSend() {
         'Content-Type': `multipart/form-data; boundary=${form._boundary}`,
       },
     });
+
+    console.log(`${requestName} got status:`, response.status);
   } catch (error) {
     const stringError = String(error);
+    console.log(`${requestName} rejected:`, stringError);
     fs.mkdirSync(logDirectory, { recursive: true });
     fs.writeFileSync(`${logDirectory}test${uuidv4()}.log`, stringError);
+  } finally {
+    if (indexInfo >= requestsQuantity) {
+      try {
+        fs.rmdirSync(paths.uploads);
+      } catch (error) {
+        if (error.code === 'ENOTEMPTY') console.log(`There is leftover trash in ${paths.uploads}`);
+      }
+    }
   }
 }
 
@@ -64,7 +76,7 @@ function runTests() {
       return;
     }
     i++;
-    testFileSend();
+    testFileSend(i);
   }, requestsInterval);
 }
 

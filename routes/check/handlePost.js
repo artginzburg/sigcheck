@@ -1,7 +1,4 @@
-const fs = require('fs');
 const fsExtra = require('fs-extra');
-
-const { paths } = require('../../serverConfig');
 
 const getSigns = require('./getSigns');
 
@@ -12,15 +9,9 @@ const handlePost = async (req, res) => {
 
   try {
     const signs = await getSigns(filepath);
-    console.log('Sent status (among other info):', signs.status);
+    // console.log('Sent status (among other info):', signs.status);
     res.send(signs);
     fsExtra.removeSync(filepath);
-
-    try {
-      fs.rmdirSync(paths.uploads);
-    } catch (error) {
-      if (error.code === 'ENOTEMPTY') console.log(`There is leftover trash in ${paths.uploads}`);
-    }
   } catch (error) {
     console.error(error);
     res.status(500).send(`Server error: ${error}`);

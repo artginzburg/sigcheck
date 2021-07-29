@@ -1,8 +1,8 @@
-module.exports = async function runParser(parser, browser, pathName) {
+module.exports = async function runParser(parser, browser, pathName, parserName) {
   try {
     const result = await parser(browser, 1, pathName);
     return result;
   } catch (error) {
-    console.error(error);
+    console.error(`Parser ${parserName} failed:`, error);
   }
 };
