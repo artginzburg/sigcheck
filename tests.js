@@ -1,14 +1,14 @@
-const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
+const fs = require('fs');
+const fsExtra = require('fs-extra');
 const axios = require('axios');
 const FormData = require('form-data');
-const rimraf = require('rimraf');
 
 const { paths, routes, formdataNames, address } = require('./serverConfig');
 
 function removeLeftovers() {
   if (fs.existsSync(paths.uploads)) {
-    rimraf(paths.uploads, console.log);
+    fsExtra.removeSync(paths.uploads);
   }
   const traineddatapath = './eng.traineddata';
   if (fs.existsSync(traineddatapath)) {

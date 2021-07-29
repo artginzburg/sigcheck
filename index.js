@@ -1,5 +1,4 @@
 const cors = require('cors');
-const time = require('express-timestamp');
 const express = require('express');
 
 const checkRouter = require('./routes/check');
@@ -14,8 +13,6 @@ tests.removeLeftovers();
 const app = express();
 
 app.use(cors(corsOptions));
-
-app.use(time.init);
 
 app.use(checkRouter);
 
