@@ -4,8 +4,8 @@
   "description": "Automatically check e-signature validity",
   "main": "index.js",
   "scripts": {
-    "start": "NODE_ENV=development nodemon -q",
-    "prod": "node index",
+    "start": "node index",
+    "test": "NODE_ENV=development nodemon -q",
     "cleanup": "rm -rf eng.traineddata ./uploads ./logs && echo 'Cleanup succeed'"
   },
   "repository": {
