@@ -5,7 +5,7 @@ const express = require('express');
 const checkRouter = require('./routes/check');
 
 const tests = require('./tests');
-const { PORT, corsOptions, address } = require('./serverConfig.js');
+const { PORT, corsOptions, address } = require('./serverConfig');
 
 // INITIALIZING APP
 

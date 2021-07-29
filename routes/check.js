@@ -3,9 +3,9 @@ const multer = require('multer');
 const fs = require('fs');
 const fsExtra = require('fs-extra');
 
-const { paths, routes, formdataNames } = require('../serverConfig.js');
+const { paths, routes, formdataNames } = require('../serverConfig');
 
-const getSigns = require('../getSigns.js');
+const getSigns = require('../getSigns');
 
 const router = require('express').Router();
 
