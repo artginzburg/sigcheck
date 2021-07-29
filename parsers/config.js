@@ -1,4 +1,4 @@
-const parserConfig = {
+const config = {
   activeParsers: ['cryptoPro', 'gosUslugi'],
   maximumPing: 5000,
   retryCaptcha: 9,
@@ -7,4 +7,4 @@ const parserConfig = {
   },
 };
 
-module.exports = parserConfig;
+module.exports = config;

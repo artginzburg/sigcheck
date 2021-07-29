@@ -1,7 +1,7 @@
 const { val } = require('../utils/resolveCaptcha');
 const getAllFilesNames = require('../utils/getAllFilesNames');
 
-const { maximumPing, retryCaptcha } = require('../config');
+const { maximumPing, retryCaptcha } = require('./config');
 
 module.exports = async function gosUslugi(browser, count = 1, pathName) {
   const namesArePdfSig = getAllFilesNames(pathName) === 'pdfsig';

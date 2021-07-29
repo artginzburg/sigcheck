@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 
 const runParser = require('./utils/runParser');
 
-const { puppeteerLaunchOptions, activeParsers } = require('./config');
+const { puppeteerLaunchOptions, activeParsers } = require('./parsers/config');
 
 async function getSigns(pathName) {
   const browser = await puppeteer.launch(puppeteerLaunchOptions);

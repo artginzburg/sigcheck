@@ -1,6 +1,6 @@
 const getAllFilesNames = require('../utils/getAllFilesNames');
 
-const { maximumPing } = require('../config');
+const { maximumPing } = require('./config');
 
 const errorSelector = '#server-errors';
 const resultCheckerSelector = 'label[for="VerificationResults_0__Parameters_0__Description"]';
