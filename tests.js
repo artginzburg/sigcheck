@@ -44,8 +44,19 @@ async function testFileSend() {
   }
 }
 
+const expectedTimeInSeconds = (requestsInterval / 1000) * requestsQuantity;
+const expectedTime = Math.round(expectedTimeInSeconds);
+
 function runTests() {
   // running test after the app is loaded
+  console.log(
+    `Expect all files to be sent in around ${'\x1b[91m'}${
+      expectedTimeInSeconds < 60
+        ? `${expectedTime} seconds`
+        : `${Math.round(expectedTime / 60)} minutes`
+    }${'\x1b[0m'}`
+  );
+
   let i = 0;
   var refreshId = setInterval(() => {
     if (i >= requestsQuantity) {
