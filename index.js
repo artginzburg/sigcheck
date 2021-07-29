@@ -1,23 +1,13 @@
-const cors = require('cors');
-const express = require('express');
-
-const checkRouter = require('./routes/check');
+const app = require('./app');
+const { PORT, address } = require('./serverConfig');
 
 const tests = require('./tests');
-const { PORT, corsOptions, address } = require('./serverConfig');
+const devMode = process.env.NODE_ENV === 'development';
 
-// INITIALIZING APP
-
-tests.removeLeftovers();
-
-const app = express();
-
-app.use(cors(corsOptions));
-
-app.use(checkRouter);
+devMode && tests.removeLeftovers();
 
 app.listen(PORT, () => {
   console.log(`API listening on ${address} address!`);
 
-  tests.runTests();
+  devMode && tests.runTests();
 });
