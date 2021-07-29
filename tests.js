@@ -6,8 +6,8 @@ const FormData = require('form-data');
 
 const { paths, routes, formdataNames, address } = require('./serverConfig');
 
-const requestsQuantity = 2;
-const requestsInterval = 2000;
+const requestsQuantity = 3;
+const requestsInterval = 5000;
 
 function removeLeftovers() {
   if (fs.existsSync(paths.uploads)) {
