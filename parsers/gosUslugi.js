@@ -1,4 +1,4 @@
-const { val } = require('../utils/resolveCaptcha');
+const { resolveCaptcha } = require('../utils/resolveCaptcha');
 const getAllFilesNames = require('../utils/getAllFilesNames');
 
 const { maximumPing, retryCaptcha } = require('./config');
@@ -33,7 +33,7 @@ module.exports = async function gosUslugi(browser, count = 1, pathName) {
 
   const id = images[0].split('id=')[1];
 
-  const resolved = await val(id);
+  const resolved = await resolveCaptcha(id);
 
   if (namesArePdfSig) {
     const fileInput = await page.$('input[name="docSignature"]');
@@ -51,26 +51,12 @@ module.exports = async function gosUslugi(browser, count = 1, pathName) {
       delay: 10,
     });
 
-    // const serverErrorSelector = '.b-error';
-
-    // try {
-    //   const isServerError = await page.waitForSelector(serverErrorSelector, {
-    //     timeout: 300,
-    //   });
-
-    //   if (isServerError) {
-    //     throw 'Ошибка на стороне сервера госуслуг';
-    //   }
-    // } catch (error) {
-    //   throw error;
-    // }
-
     try {
       await page.waitForSelector('#elsign-result', {
         timeout: maximumPing,
       });
     } catch (err) {
-      throw 'Капча провалена';
+      throw 'Капча провалена.';
     }
 
     const resultElement = await page.$('#elsign-result');

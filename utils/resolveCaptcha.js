@@ -1,7 +1,7 @@
 const { createWorker } = require('tesseract.js');
 const worker = createWorker({});
 
-const resolveCaptcha = async (url) => {
+const resolveThroughWorker = async (url) => {
   await worker.load();
   await worker.loadLanguage('eng');
   await worker.initialize('eng');
@@ -16,28 +16,19 @@ const resolveCaptcha = async (url) => {
   return text;
 };
 
-const resolved = async (id) => ({
-  captchaAnswer: await resolveCaptcha(`https://www.gosuslugi.ru/pgu/captcha/get?id=${id}`),
-  captchaId: id,
-});
+const resolved = async (id) =>
+  await resolveThroughWorker(`https://www.gosuslugi.ru/pgu/captcha/get?id=${id}`);
 
-const val = async (id) => {
+const resolveCaptcha = async (id) => {
   do {
-    final = await resolved(id);
-    res = final.captchaAnswer;
-    if (res.length === 6) {
-      break;
-    }
+    var captchaAnswer = await resolved(id);
+    var res = captchaAnswer.trim();
+    captchaAnswer = res + '\n';
   } while (!(res.length === 5));
 
-  return {
-    ...final,
-    captchaId: id,
-  };
+  return { captchaAnswer };
 };
 
 module.exports = {
   resolveCaptcha,
-  resolved,
-  val,
 };

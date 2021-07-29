@@ -6,6 +6,9 @@ const FormData = require('form-data');
 
 const { paths, routes, formdataNames, address } = require('./serverConfig');
 
+const requestsQuantity = 2;
+const requestsInterval = 2000;
+
 function removeLeftovers() {
   if (fs.existsSync(paths.uploads)) {
     fsExtra.removeSync(paths.uploads);
@@ -43,9 +46,6 @@ async function testFileSend() {
 
 function runTests() {
   // running test after the app is loaded
-  const requestsQuantity = 4;
-  const requestsInterval = 3000;
-
   let i = 0;
   var refreshId = setInterval(() => {
     if (i >= requestsQuantity) {
