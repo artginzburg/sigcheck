@@ -14,8 +14,12 @@ async function getSigns(pathName) {
 
   await browser.close();
 
-  console.log('Sent result: ', result);
-  return result;
+  const answer = {
+    status: result.cryptoPro.status && result.gosUslugi.status,
+    details: result,
+  };
+
+  return answer;
 }
 
 module.exports = getSigns;

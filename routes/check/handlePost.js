@@ -12,6 +12,7 @@ const handlePost = async (req, res) => {
 
   try {
     const signs = await getSigns(filepath);
+    console.log('Sent status (among other info):', signs.status);
     res.send(signs);
     fsExtra.removeSync(filepath);
 

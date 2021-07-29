@@ -6,7 +6,7 @@ const FormData = require('form-data');
 
 const { paths, routes, formdataNames, address } = require('./serverConfig');
 
-const requestsQuantity = 3;
+const requestsQuantity = 1;
 const requestsInterval = 5000;
 
 function removeLeftovers() {
