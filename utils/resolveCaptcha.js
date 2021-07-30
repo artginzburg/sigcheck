@@ -5,9 +5,17 @@ const captchaUrl = new URL('/pgu/captcha/get', baseUrl);
 
 const captchaLength = 5;
 
-const resolveThroughWorker = async (url) => {
+const resolveCaptcha = async (id, index, count) => {
+  const imageToResolve = captchaUrl;
+  imageToResolve.searchParams.set('id', id);
+
+  const url = imageToResolve.href;
+
   await worker.configuredLoad();
 
+  console.log(`реквест ${index} (try ${count}) всё ещё тут, после загрузки воркера`);
+
+  // Вот здесь проёбывается запрос, в цикле дувайл
   do {
     var {
       data: { text },
@@ -15,16 +23,12 @@ const resolveThroughWorker = async (url) => {
     var res = text.trim();
   } while (res.length !== captchaLength);
 
-  return text;
-};
+  console.log(`реквест ${index} (try ${count}) ещё не проебался после дувайл`);
 
-const resolved = async (id) => {
-  const imageToResolve = captchaUrl;
-  imageToResolve.searchParams.set('id', id);
-  return await resolveThroughWorker(imageToResolve.href);
+  return {
+    captchaAnswer: text,
+  };
 };
-
-const resolveCaptcha = async (id) => ({ captchaAnswer: await resolved(id) });
 
 module.exports = {
   resolveCaptcha,

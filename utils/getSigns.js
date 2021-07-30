@@ -10,13 +10,26 @@ async function getSigns(pathName, index) {
 
   // console.log('Running parsers...');
   for await (const parser of activeParsers) {
-    result[parser] = await runParser(require(`../parsers/${parser}`), browser, pathName, parser, index);
+    result[parser] = await runParser(
+      require(`../parsers/${parser}`),
+      browser,
+      pathName,
+      parser,
+      index
+    );
   }
+
+  const status =
+    result.cryptoPro && result.gosUslugi
+      ? result.cryptoPro.status && result.gosUslugi.status
+      : result.cryptoPro
+      ? result.cryptoPro.status
+      : result.gosUslugi.status;
 
   await browser.close();
 
   const answer = {
-    status: result.cryptoPro.status && result.gosUslugi.status,
+    status,
     details: result,
   };
 

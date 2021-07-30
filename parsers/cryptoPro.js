@@ -73,7 +73,7 @@ module.exports = async function cryptoPro(browser, count, pathName, index) {
     const errorValue = await page.evaluate((el) => el.textContent, errorElement);
 
     if (!errorValue) {
-      throw 'Не удалось получить контент поля ошибки';
+      console.error('Не удалось получить контент поля ошибки');
     }
     const signIsFalse = errorValue && errorValue.includes(errorText);
 

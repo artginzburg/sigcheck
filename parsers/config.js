@@ -1,5 +1,8 @@
 const config = {
-  activeParsers: ['cryptoPro', 'gosUslugi'],
+  activeParsers: [
+    // 'cryptoPro',
+    'gosUslugi',
+  ],
   maximumPing: 3000,
   retryCaptcha: 9,
   puppeteerLaunchOptions: {

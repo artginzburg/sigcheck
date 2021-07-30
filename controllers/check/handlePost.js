@@ -4,7 +4,6 @@ const getSigns = require('../../utils/getSigns');
 
 const handlePost = async (req, res) => {
   res.setHeader('Content-Type', 'application/json');
-  console.log(req.body)
   const filepath = req.files[0].destination;
 
   try {

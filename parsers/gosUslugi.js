@@ -19,9 +19,13 @@ module.exports = async function gosUslugi(browser, count = 1, pathName, index) {
 
   await page.goto('https://www.gosuslugi.ru/pgu/eds');
 
+  console.log(
+    `Я реквест номер ${index} (try ${count}), подтверждаю, что не проебался почти в самом начале госуслуг`
+  );
+
   const currentActionLink = await page.$('a[name="currentAction"]');
   if (!currentActionLink && count == 1) {
-    throw 'На странице госуслуг отсутствует необходимая кнопка (ссылка)';
+    console.error('На странице госуслуг отсутствует необходимая кнопка (ссылка)');
   }
 
   currentActionLink && (await currentActionLink.click());
@@ -33,20 +37,24 @@ module.exports = async function gosUslugi(browser, count = 1, pathName, index) {
 
   const id = images[0].split('id=')[1];
 
-  const resolved = await resolveCaptcha(id);
-
-  if (namesArePdfSig) {
-    const fileInput = await page.$('input[name="docSignature"]');
-    await fileInput.uploadFile(`${pathName}test.pdf`);
-
-    const fileInput2 = await page.$('input[name="docDocument"]');
-    await fileInput2.uploadFile(`${pathName}test.sig`);
-  } else {
-    const fileInput = await page.$('input[name="document"]');
-    await fileInput.uploadFile(`${pathName}test.sig`);
-  }
+  console.log(`Я реквест номер ${index} (try ${count}), подтверждаю, что не проебался перед траем`);
 
   try {
+    const resolved = await resolveCaptcha(id, index, count);
+
+    console.log(`Resolved: ${index} (try ${count})`, resolved);
+
+    if (namesArePdfSig) {
+      const fileInput = await page.$('input[name="docSignature"]');
+      await fileInput.uploadFile(`${pathName}test.pdf`);
+
+      const fileInput2 = await page.$('input[name="docDocument"]');
+      await fileInput2.uploadFile(`${pathName}test.sig`);
+    } else {
+      const fileInput = await page.$('input[name="document"]');
+      await fileInput.uploadFile(`${pathName}test.sig`);
+    }
+
     await page.type(`#captchaAnswer${captchaNumber}`, resolved.captchaAnswer, {
       delay: 10,
     });
@@ -56,8 +64,7 @@ module.exports = async function gosUslugi(browser, count = 1, pathName, index) {
         timeout: maximumPing,
       });
     } catch (err) {
-      
-      throw 'Капча провалена (' + index + ').'
+      throw `Капча провалена (${index}).`;
     }
 
     const resultElement = await page.$('#elsign-result');
@@ -83,7 +90,7 @@ module.exports = async function gosUslugi(browser, count = 1, pathName, index) {
       return { status: 'error' };
     } else {
       console.log(error, 'Попробую снова.');
-      return await gosUslugi(browser, count + 1, pathName);
+      return gosUslugi(browser, count + 1, pathName, index);
     }
   }
 };

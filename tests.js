@@ -21,9 +21,8 @@ async function testFileSend(indexInfo) {
 
   const testFile = fs.createReadStream('./test.sig');
   const logDirectory = './logs/';
-  form.append('index', indexInfo)
+  form.append('index', indexInfo);
   form.append(formdataNames.check, testFile);
-
 
   const requestName = `Request ${indexInfo}`;
 
@@ -38,11 +37,16 @@ async function testFileSend(indexInfo) {
     });
 
     console.log(`${requestName} got status:`, response.status);
+    // fs.mkdirSync(`./responses/`, { recursive: true });
+    // fs.writeFileSync(
+    //   `${`./responses/`}response${requestName}Index${uuidv4()}.log`,
+    //   JSON.stringify(response, replacerFunc())
+    // );
   } catch (error) {
     const stringError = String(error);
     console.log(`${requestName} rejected:`, stringError);
     fs.mkdirSync(logDirectory, { recursive: true });
-    fs.writeFileSync(`${logDirectory}test${uuidv4()}.log`, stringError);
+    fs.writeFileSync(`${logDirectory}test${requestName}Index${uuidv4()}.log`, stringError);
   } finally {
     if (indexInfo >= requestsQuantity) {
       console.log('End of test.');
