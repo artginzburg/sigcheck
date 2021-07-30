@@ -70,10 +70,15 @@ function runTests() {
     }${'\x1b[0m'}`
   );
 
+  const startTime = new Date();
+
   let i = 0;
-  var refreshId = setInterval(() => {
+  var refreshId = setInterval(async () => {
     if (i >= requestsQuantity) {
       clearInterval(refreshId);
+      const result = await testFileSend(i);
+      const endTime = new Date();
+      console.log('Total execution time:', Date.toString(endTime - startTime));
       return;
     }
     i++;
