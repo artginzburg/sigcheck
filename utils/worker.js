@@ -1,4 +1,4 @@
-const { createWorker } = require('tesseract.js');
+const { createWorker, PSM } = require('tesseract.js');
 
 const language = 'eng';
 const captchaSymbols = '0123456789';
@@ -13,7 +13,8 @@ worker.configuredLoad = async () => {
   await worker.initialize(language);
   await worker.setParameters({
     tessedit_char_whitelist: captchaSymbols,
-    tessedit_pageseg_mode: ['PSM_SINGLE_WORD'],
+    tessedit_pageseg_mode: PSM.SINGLE_WORD,
+    preserve_interword_spaces: '0',
   });
 
   return worker;

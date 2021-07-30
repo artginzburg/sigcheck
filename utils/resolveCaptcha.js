@@ -8,9 +8,12 @@ const captchaLength = 5;
 const resolveThroughWorker = async (url) => {
   await worker.configuredLoad();
 
-  const {
-    data: { text },
-  } = await worker.recognize(url);
+  do {
+    var {
+      data: { text },
+    } = await worker.recognize(url);
+    var res = text.trim();
+  } while (res.length !== captchaLength);
 
   return text;
 };
@@ -21,15 +24,7 @@ const resolved = async (id) => {
   return await resolveThroughWorker(imageToResolve.href);
 };
 
-const resolveCaptcha = async (id) => {
-  do {
-    var captchaAnswer = await resolved(id);
-    var res = captchaAnswer.trim();
-    captchaAnswer = res + '\n';
-  } while (!(res.length === captchaLength));
-
-  return { captchaAnswer };
-};
+const resolveCaptcha = async (id) => ({ captchaAnswer: await resolved(id) });
 
 module.exports = {
   resolveCaptcha,
