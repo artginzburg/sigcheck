@@ -7,7 +7,7 @@ const devMode = process.env.NODE_ENV === 'development';
 
 devMode && tests.removeLeftovers();
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   const listeningMessage = [
     devMode && '\x1b[36m',
     `API listening on ${address} address!`,
@@ -16,4 +16,10 @@ app.listen(PORT, () => {
   console.log(listeningMessage.filter(Boolean).join(' '));
 
   devMode && tests.runTests();
+});
+
+process.on('SIGTERM', () => {
+  server.close(() => {
+    console.log('Process terminated');
+  });
 });

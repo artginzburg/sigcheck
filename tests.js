@@ -43,11 +43,16 @@ async function testFileSend(indexInfo) {
     fs.writeFileSync(`${logDirectory}test${uuidv4()}.log`, stringError);
   } finally {
     if (indexInfo >= requestsQuantity) {
+      console.log('End of test.');
       try {
         fs.rmdirSync(paths.uploads);
       } catch (error) {
-        if (error.code === 'ENOTEMPTY') console.log(`There is leftover trash in ${paths.uploads}`);
+        if (error.code === 'ENOTEMPTY') {
+          console.log(`There is leftover trash in ${paths.uploads}!`);
+          process.exitCode = 1;
+        }
       }
+      process.kill(process.pid, 'SIGTERM');
     }
   }
 }
