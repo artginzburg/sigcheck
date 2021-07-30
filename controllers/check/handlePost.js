@@ -1,6 +1,6 @@
 const fsExtra = require('fs-extra');
 
-const getSigns = require('./getSigns');
+const getSigns = require('../../utils/getSigns');
 
 const handlePost = async (req, res) => {
   res.setHeader('Content-Type', 'application/json');

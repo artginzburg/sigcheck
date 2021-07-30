@@ -1,4 +1,4 @@
-const { worker, workerConfiguredLoad } = require('./worker');
+const worker = require('./worker');
 
 const baseUrl = 'https://www.gosuslugi.ru';
 const captchaUrl = new URL('/pgu/captcha/get', baseUrl);
@@ -6,7 +6,7 @@ const captchaUrl = new URL('/pgu/captcha/get', baseUrl);
 const captchaLength = 5;
 
 const resolveThroughWorker = async (url) => {
-  await workerConfiguredLoad();
+  await worker.configuredLoad();
 
   const {
     data: { text },

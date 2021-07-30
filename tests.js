@@ -13,10 +13,6 @@ function removeLeftovers() {
   if (fs.existsSync(paths.uploads)) {
     fsExtra.removeSync(paths.uploads);
   }
-  const traineddatapath = './eng.traineddata';
-  if (fs.existsSync(traineddatapath)) {
-    fs.unlinkSync(traineddatapath);
-  }
 }
 
 async function testFileSend(indexInfo) {

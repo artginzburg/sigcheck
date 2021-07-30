@@ -1,9 +1,9 @@
 const slowDown = require('express-slow-down');
 
-const { routes, formdataNames } = require('../../serverConfig');
+const { formdataNames } = require('../../serverConfig');
 
 const { upload } = require('./multer');
-const handlePost = require('./handlePost');
+const handlePost = require('../../controllers/check/handlePost');
 
 const router = require('express').Router();
 
@@ -20,6 +20,6 @@ router.use(speedLimiter);
 
 router.use(upload.array(formdataNames.check, maxFiles));
 
-router.post(routes.check, handlePost);
+router.post('/', handlePost);
 
 module.exports = router;

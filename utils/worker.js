@@ -1,20 +1,22 @@
 const { createWorker } = require('tesseract.js');
 
-const workerLanguage = 'eng';
+const language = 'eng';
 const captchaSymbols = '0123456789';
 
-const worker = createWorker();
+const worker = createWorker({
+  cacheMethod: 'readOnly',
+});
 
-async function workerConfiguredLoad() {
+worker.configuredLoad = async () => {
   await worker.load();
-  await worker.loadLanguage(workerLanguage);
-  await worker.initialize(workerLanguage);
+  await worker.loadLanguage(language);
+  await worker.initialize(language);
   await worker.setParameters({
     tessedit_char_whitelist: captchaSymbols,
+    tessedit_pageseg_mode: ['PSM_SINGLE_WORD'],
   });
-}
 
-module.exports = {
-  workerConfiguredLoad,
-  worker,
+  return worker;
 };
+
+module.exports = worker;

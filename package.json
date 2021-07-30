@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index",
     "test": "NODE_ENV=development nodemon -q",
-    "cleanup": "rm -rf eng.traineddata ./uploads ./logs && echo 'Cleanup succeed'"
+    "cleanup": "rm -rf ./uploads ./logs && echo 'Cleanup succeed'"
   },
   "repository": {
     "type": "git",
