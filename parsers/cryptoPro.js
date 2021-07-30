@@ -9,7 +9,7 @@ const errorText = 'Произошла ошибка при проверке до�
 const waitForSelectors = async (page, arr, ...rest) =>
   await page.waitForSelector(arr.filter(Boolean).join(','), ...rest);
 
-module.exports = async function cryptoPro(browser, count, pathName) {
+module.exports = async function cryptoPro(browser, count, pathName, index) {
   const namesArePdfSig = getAllFilesNames(pathName) === 'pdfsig';
   const page = await browser.newPage();
 

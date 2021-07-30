@@ -3,7 +3,7 @@ const app = require('./app');
 const { PORT, address } = require('./serverConfig');
 
 const tests = require('./tests');
-const devMode = process.env.NODE_ENV === 'development';
+const devMode = 'development';
 
 devMode && tests.removeLeftovers();
 

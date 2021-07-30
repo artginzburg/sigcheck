@@ -3,7 +3,7 @@ const getAllFilesNames = require('../utils/getAllFilesNames');
 
 const { maximumPing, retryCaptcha } = require('./config');
 
-module.exports = async function gosUslugi(browser, count = 1, pathName) {
+module.exports = async function gosUslugi(browser, count = 1, pathName, index) {
   const namesArePdfSig = getAllFilesNames(pathName) === 'pdfsig';
   const captchaNumber = namesArePdfSig ? 3 : 2;
 
@@ -56,7 +56,8 @@ module.exports = async function gosUslugi(browser, count = 1, pathName) {
         timeout: maximumPing,
       });
     } catch (err) {
-      throw 'Капча провалена.';
+      
+      throw 'Капча провалена (' + index + ').'
     }
 
     const resultElement = await page.$('#elsign-result');

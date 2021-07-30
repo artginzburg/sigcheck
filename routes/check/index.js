@@ -1,5 +1,5 @@
 const slowDown = require('express-slow-down');
-
+const bodyParser = require('body-parser')
 const { formdataNames } = require('../../serverConfig');
 
 const { upload } = require('./multer');
@@ -15,6 +15,10 @@ const speedLimiter = slowDown({
   delayMs: 6 * 1000, // begin adding delayMs milliseconds of delay per request above delayAfter requests:
   // maxDelayMs: 20 * 1000, // maximum delay is maxDelayMs milliseconds
 });
+
+router.use(bodyParser.urlencoded({ extended: false }))
+ 
+router.use(bodyParser.json())
 
 router.use(speedLimiter);
 

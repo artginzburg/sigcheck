@@ -5,6 +5,7 @@ const axios = require('axios');
 const FormData = require('form-data');
 
 const { paths, routes, formdataNames, address } = require('./serverConfig');
+const { format } = require('path');
 
 const requestsQuantity = 20;
 const requestsInterval = 10;
@@ -20,8 +21,9 @@ async function testFileSend(indexInfo) {
 
   const testFile = fs.createReadStream('./test.sig');
   const logDirectory = './logs/';
-
+  form.append('index', indexInfo)
   form.append(formdataNames.check, testFile);
+
 
   const requestName = `Request ${indexInfo}`;
 
