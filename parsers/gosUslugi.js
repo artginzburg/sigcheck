@@ -6,8 +6,8 @@ const sortByExtension = require('./sortByExtension');
 
 module.exports = async function gosUslugi(browser, count = 1, pathName, index) {
   const files = getFileNames(pathName);
-  const namesArePdfSig = filesArePdfOrJpgSig(files);
-  const captchaNumber = namesArePdfSig ? 3 : 2;
+  const filenames = sortByExtension(files);
+  const captchaNumber = filenames.pdfOrJpg ? 3 : 2;
 
   const page = await browser.newPage();
 
@@ -47,9 +47,7 @@ module.exports = async function gosUslugi(browser, count = 1, pathName, index) {
 
     console.log(`Resolved: ${index} (try ${count})`, resolved);
 
-    const filenames = sortByExtension(files);
-
-    if (namesArePdfSig) {
+    if (filenames.pdfOrJpg) {
       const fileInput = await page.$('input[name="docSignature"]');
       await fileInput.uploadFile(`${pathName}${filenames.pdfOrJpg}`);
 

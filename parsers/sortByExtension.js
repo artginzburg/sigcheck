@@ -1,3 +1,7 @@
+const sigExt = 'sig';
+const pdfExt = 'pdf';
+const jpgExt = ['jpg', 'jpeg'];
+
 module.exports = function sortByExtension(files) {
   const filenames = {};
 
@@ -5,12 +9,18 @@ module.exports = function sortByExtension(files) {
     const splitted = file.split('.');
     const extension = splitted[splitted.length - 1];
 
-    if (['pdf', 'jpg', 'jpeg'].includes(extension)) {
+    if ([pdfExt, ...jpgExt].includes(extension)) {
       filenames.pdfOrJpg = file;
-    } else {
+    }
+    if ([sigExt].includes(extension)) {
       filenames.sig = file;
     }
   });
+
+  if (Object.keys(filenames).length === 0) {
+    filenames.error =
+      'Среди файлов не нашлось электронных подписей в формате .sig, .pdf, .jpg или .jpeg';
+  }
 
   return filenames;
 };

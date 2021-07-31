@@ -1,4 +1,4 @@
-const { getFileNames, filesArePdfOrJpgSig } = require('../utils/getAllFilesNames');
+const { getFileNames } = require('../utils/getAllFilesNames');
 
 const { maximumPing } = require('./config');
 const sortByExtension = require('./sortByExtension');
@@ -12,7 +12,6 @@ const waitForSelectors = async (page, arr, ...rest) =>
 
 module.exports = async function cryptoPro(browser, count, pathName, index) {
   const files = getFileNames(pathName);
-  const namesArePdfSig = filesArePdfOrJpgSig(files);
   const page = await browser.newPage();
 
   await page.goto('https://www.justsign.me/verifyqca/Verify/');
@@ -22,7 +21,7 @@ module.exports = async function cryptoPro(browser, count, pathName, index) {
   const fileInput = await page.$('input[name="SignatureFile"]');
   await fileInput.uploadFile(`${pathName}${filenames.sig}`);
 
-  if (namesArePdfSig) {
+  if (filenames.pdfOrJpg) {
     await page.click('a[href="#signature-parameters"]');
 
     await page.waitForTimeout(200);
