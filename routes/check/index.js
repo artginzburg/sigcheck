@@ -20,7 +20,7 @@ router.use(express.urlencoded({ extended: false }));
 router.use(express.json());
 
 router.use((req, res, next) => {
-  const filepath = `${paths.uploads}${req.body.index}_${uuidv4()}/`;
+  const filepath = `${paths.uploads}${uuidv4()}/`;
 
   fs.mkdirSync(filepath, { recursive: true });
 
