@@ -5,10 +5,9 @@ const axios = require('axios');
 const FormData = require('form-data');
 
 const { paths, routes, formdataNames, address } = require('./serverConfig');
-const { format } = require('path');
 
-const requestsQuantity = 20;
-const requestsInterval = 10;
+const requestsQuantity = 60;
+const requestsInterval = 200;
 
 function removeLeftovers() {
   if (fs.existsSync(paths.uploads)) {

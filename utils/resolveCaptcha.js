@@ -15,18 +15,20 @@ const resolveCaptcha = async (id, index, count) => {
 
   console.log(`реквест ${index} (try ${count}) всё ещё тут, после загрузки воркера`);
 
-  // Вот здесь проёбывается запрос, в цикле дувайл
-  do {
-    var {
-      data: { text },
-    } = await worker.recognize(url);
-    var res = text.trim();
-  } while (res.length !== captchaLength);
-
   console.log(`реквест ${index} (try ${count}) ещё не проебался после дувайл`);
 
   return {
-    captchaAnswer: text,
+    captchaAnswer: await (async () => {
+      // Вот здесь проёбывается запрос, в цикле дувайл
+      do {
+        var {
+          data: { text },
+        } = await worker.recognize(url);
+        var res = text.trim();
+      } while (res.length !== captchaLength);
+
+      return text;
+    })(),
   };
 };
 

@@ -1,5 +1,5 @@
-const slowDown = require('express-slow-down');
-const bodyParser = require('body-parser');
+const express = require('express');
+const queue = require('express-queue');
 const { formdataNames } = require('../../serverConfig');
 
 const { upload } = require('./multer');
@@ -9,18 +9,11 @@ const router = require('express').Router();
 
 const maxFiles = 50;
 
-const speedLimiter = slowDown({
-  windowMs: 20 * 1000,
-  // delayAfter: 1, // default: allow 1 request per windowsMs milliseconds, then...
-  delayMs: 20 * 1000, // begin adding delayMs milliseconds of delay per request above delayAfter requests:
-  // maxDelayMs: 20 * 1000, // maximum delay is maxDelayMs milliseconds
-});
+router.use(queue({ activeLimit: 1, queuedLimit: -1 }));
 
-router.use(bodyParser.urlencoded({ extended: false }));
+router.use(express.urlencoded({ extended: false }));
 
-router.use(bodyParser.json());
-
-router.use(speedLimiter);
+router.use(express.json());
 
 router.use(upload.array(formdataNames.check, maxFiles));
 

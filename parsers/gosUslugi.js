@@ -40,6 +40,7 @@ module.exports = async function gosUslugi(browser, count = 1, pathName, index) {
   console.log(`Я реквест номер ${index} (try ${count}), подтверждаю, что не проебался перед траем`);
 
   try {
+    console.log(`Я реквест номер ${index} (try ${count}), подтверждаю, что зашёл в трай`);
     const resolved = await resolveCaptcha(id, index, count);
 
     console.log(`Resolved: ${index} (try ${count})`, resolved);
@@ -84,6 +85,7 @@ module.exports = async function gosUslugi(browser, count = 1, pathName, index) {
 
     return result;
   } catch (error) {
+    console.log(`Я реквест номер ${index} (try ${count}), папал в кеч памагите!`);
     await page.close();
     if (count > retryCaptcha) {
       console.log(`Провалил ${count} раз подряд, закругляюсь.`, error);

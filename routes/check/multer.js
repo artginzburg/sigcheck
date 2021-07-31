@@ -5,8 +5,8 @@ const fs = require('fs');
 const { paths } = require('../../serverConfig');
 
 const storage = multer.diskStorage({
-  destination: function (req_, file_, callback) {
-    const filepath = `${paths.uploads}${uuidv4()}/`;
+  destination: function (req, file_, callback) {
+    const filepath = `${paths.uploads}${req.body.index}_${uuidv4()}/`;
 
     fs.mkdirSync(filepath, { recursive: true });
     callback(null, filepath);
