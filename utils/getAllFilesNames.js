@@ -4,9 +4,11 @@ const resSuffix = 'sig';
 const pdfExt = 'pdf';
 const jpgExt = ['jpg', 'jpeg'];
 
-module.exports = function getAllFilesNames(pathName) {
-  let files = fs.readdirSync(pathName);
+function getFileNames(pathName) {
+  return fs.readdirSync(pathName);
+}
 
+function filesArePdfOrJpgSig(files) {
   const filtered = files.filter((file) =>
     [resSuffix, pdfExt, ...jpgExt].includes(file.split('.')[1])
   ).length;
@@ -23,6 +25,13 @@ module.exports = function getAllFilesNames(pathName) {
       }
 
       return 'to';
-    })() + resSuffix
+    })() +
+      resSuffix ===
+    'pdfsig'
   );
+}
+
+module.exports = {
+  getFileNames,
+  filesArePdfOrJpgSig,
 };

@@ -2,8 +2,8 @@
 const app = require('./app');
 const { PORT, address } = require('./serverConfig');
 
-const tests = require('./tests');
-const devMode = 'development';
+const devMode = process.env.NODE_ENV === 'development';
+const tests = devMode ? require('./tests') : undefined;
 
 devMode && tests.removeLeftovers();
 

@@ -18,7 +18,8 @@ function removeLeftovers() {
 async function testFileSend(indexInfo) {
   const form = new FormData();
 
-  const testFile = fs.createReadStream('./test.sig');
+  const testFile = fs.createReadStream('./sigsForTests/testForPdf.sig');
+  // const testFileJpg = fs.createReadStream('./sigsForTests/testForPdf.jpg');
   const logDirectory = './logs/';
   form.append('index', indexInfo);
   form.append(formdataNames.check, testFile);

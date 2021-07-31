@@ -1,10 +1,12 @@
 const { resolveCaptcha } = require('../utils/resolveCaptcha');
-const getAllFilesNames = require('../utils/getAllFilesNames');
+const { getFileNames, filesArePdfOrJpgSig } = require('../utils/getAllFilesNames');
 
 const { maximumPing, retryCaptcha } = require('./config');
+const sortByExtension = require('./sortByExtension');
 
 module.exports = async function gosUslugi(browser, count = 1, pathName, index) {
-  const namesArePdfSig = getAllFilesNames(pathName) === 'pdfsig';
+  const files = getFileNames(pathName);
+  const namesArePdfSig = filesArePdfOrJpgSig(files);
   const captchaNumber = namesArePdfSig ? 3 : 2;
 
   const page = await browser.newPage();
@@ -45,15 +47,17 @@ module.exports = async function gosUslugi(browser, count = 1, pathName, index) {
 
     console.log(`Resolved: ${index} (try ${count})`, resolved);
 
+    const filenames = sortByExtension(files);
+
     if (namesArePdfSig) {
       const fileInput = await page.$('input[name="docSignature"]');
-      await fileInput.uploadFile(`${pathName}test.pdf`);
+      await fileInput.uploadFile(`${pathName}${filenames.pdfOrJpg}`);
 
       const fileInput2 = await page.$('input[name="docDocument"]');
-      await fileInput2.uploadFile(`${pathName}test.sig`);
+      await fileInput2.uploadFile(`${pathName}${filenames.sig}`);
     } else {
       const fileInput = await page.$('input[name="document"]');
-      await fileInput.uploadFile(`${pathName}test.sig`);
+      await fileInput.uploadFile(`${pathName}${filenames.sig}`);
     }
 
     await page.type(`#captchaAnswer${captchaNumber}`, resolved.captchaAnswer, {
