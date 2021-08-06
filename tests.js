@@ -6,7 +6,7 @@ const FormData = require('form-data');
 
 const { paths, routes, formdataNames, address } = require('./serverConfig');
 
-const requestsQuantity = 60;
+const requestsQuantity = 0;
 const requestsInterval = 200;
 
 function removeLeftovers() {
@@ -18,7 +18,8 @@ function removeLeftovers() {
 async function testFileSend(indexInfo) {
   const form = new FormData();
 
-  const testFile = fs.createReadStream('./sigsForTests/testForPdf.sig');
+  const testFile = fs.createReadStream('./test.sig');
+  // const testFile = fs.createReadStream('./sigsForTests/testForPdf.sig');
   // const testFileJpg = fs.createReadStream('./sigsForTests/testForPdf.jpg');
   const logDirectory = './logs/';
   form.append('index', indexInfo);
@@ -36,7 +37,9 @@ async function testFileSend(indexInfo) {
       },
     });
 
-    console.log(`${requestName} got status:`, response.status);
+    console.log('Response:', response.data);
+
+    // console.log(`${requestName} got status:`, response.status);
     // fs.mkdirSync(`./responses/`, { recursive: true });
     // fs.writeFileSync(
     //   `${`./responses/`}response${requestName}Index${uuidv4()}.log`,

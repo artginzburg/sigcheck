@@ -1,3 +1,6 @@
+const FormData = require('form-data');
+const fs = require('fs');
+
 const { getFileNames } = require('../utils/getAllFilesNames');
 
 const { maximumPing } = require('./config');
@@ -14,37 +17,55 @@ module.exports = async function cryptoPro(browser, count, pathName, index) {
   const files = getFileNames(pathName);
   const page = await browser.newPage();
 
+  // Allows you to intercept a request; must appear before
+  // your first page.goto()
+  await page.setRequestInterception(true);
+
+  // Request intercept handler... will be triggered with
+  // each page.goto() statement
+  page.once('request', (interceptedRequest) => {
+    const form = new FormData();
+
+    const filenames = sortByExtension(files);
+
+    form.append('action', 'Проверить');
+
+    const file1 = fs.readFileSync(`${pathName}${filenames.sig}`);
+    form.append('SignatureFile', file1, { filename: filenames.sig });
+
+    form.append('SignatureType', 'CMS');
+
+    form.append('Detached', filenames.pdfOrJpg ? 'true' : 'false');
+
+    if (filenames.pdfOrJpg) {
+      form.append('Hash', 'false');
+    }
+    form.append('HashAlgorithm', 'GOST R 34.11-94');
+
+    if (filenames.pdfOrJpg) {
+      const file2 = fs.readFileSync(`${pathName}${filenames.pdfOrJpg}`);
+      form.append('DocumentFile', file2, { filename: filenames.pdfOrJpg });
+    } else {
+      form.append('DocumentFile', '');
+    }
+
+    form.append('CertificateFile', '');
+
+    const data = {
+      method: 'POST',
+      postData: form.getBuffer(),
+      headers: {
+        ...interceptedRequest.headers(),
+        'Content-Type': `multipart/form-data; boundary=${form._boundary}`,
+      },
+    };
+
+    interceptedRequest.continue(data);
+
+    page.setRequestInterception(false);
+  });
+
   await page.goto('https://www.justsign.me/verifyqca/Verify/');
-
-  const filenames = sortByExtension(files);
-
-  const fileInput = await page.$('input[name="SignatureFile"]');
-  await fileInput.uploadFile(`${pathName}${filenames.sig}`);
-
-  if (filenames.pdfOrJpg) {
-    await page.click('a[href="#signature-parameters"]');
-
-    await page.waitForTimeout(200);
-
-    const detachedTrueSelector = 'input[name="Detached"][value="true"]';
-    await page.waitForSelector(detachedTrueSelector, {
-      timeout: 500,
-    });
-    await page.click(detachedTrueSelector);
-
-    const detachedOpenerSelector = 'a[href="#signature-document"]';
-    await page.waitForSelector(detachedOpenerSelector, {
-      timeout: 500,
-    });
-    await page.click(detachedOpenerSelector);
-
-    const fileInput2Element = await page.$('input[name="DocumentFile"]');
-
-    const fileInput2 = await page.evaluateHandle((el) => el.nextElementSibling, fileInput2Element);
-    await fileInput2.uploadFile(`${pathName}${filenames.pdfOrJpg}`);
-  }
-
-  await page.click('#verify-button');
 
   await waitForSelectors(page, [resultCheckerSelector, errorSelector], {
     timeout: maximumPing,
@@ -67,7 +88,7 @@ module.exports = async function cryptoPro(browser, count, pathName, index) {
 
     readableResult = subject;
     const result = {
-      status: 'true',
+      status: true,
     };
     result.sgn = readableResult;
     await page.close();
