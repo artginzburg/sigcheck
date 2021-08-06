@@ -5,9 +5,8 @@ const hostForLog = process.env.HOST ?? 'localhost';
 const serverConfig = {
   corsOptions: {
     origin: '*',
-    methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'PATCH', 'DELETE'],
-    allowedHeaders: ['X-Requested-With', 'content-type'],
-    credentials: true,
+    methods: ['POST'],
+    allowedHeaders: ['X-Requested-With', 'Content-Type'],
   },
   paths: {
     uploads: './uploads/',
