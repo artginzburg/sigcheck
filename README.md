@@ -5,12 +5,13 @@ Follow instructions at [artginzburg/puppeteer-chromium-macOS-Firewall-popup-stop
 ### To send a file for test
 
 ```powershell
+cd testSigs/valid
 curl -vF toCheck=@test.sig http://localhost:6969/check
 ```
 
 ### To send multiple files for test
 
 ```powershell
-cd sigsForTests
-curl -vF toCheck=@testForPdf.sig -F toCheck=@testForPdf.pdf http://localhost:6969/check
+cd testSigs/valid
+curl -vF toCheck=@forTwo.sig -F toCheck=@forTwo.pdf http://localhost:6969/check
 ```
