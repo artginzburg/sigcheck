@@ -1,5 +1,5 @@
 const { resolveCaptcha } = require('../utils/resolveCaptcha');
-const { getFileNames, filesArePdfOrJpgSig } = require('../utils/getAllFilesNames');
+const { getFileNames } = require('../utils/getAllFilesNames');
 
 const { maximumPing, retryCaptcha } = require('./config');
 const sortByExtension = require('./sortByExtension');
